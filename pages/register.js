@@ -1,7 +1,6 @@
-// pages/register.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import axios from "axios";
+import axios from 'axios';
 
 export default function Register() {
     const [email, setEmail] = useState('');
@@ -15,20 +14,18 @@ export default function Register() {
         e.preventDefault();
 
         try {
-            const res = await axios('/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, email, password, isGardener }),
+            const res = await axios.post('/api/auth/register', {
+                username,
+                email,
+                password,
+                isGardener
             });
 
-            if (!res.ok) {
-                const result = await res.json();
-                throw new Error(result.error || 'Failed to register');
+            if (res.status === 201) {
+                router.push('/login');
+            } else {
+                throw new Error(res.data.error || 'Failed to register');
             }
-
-            router.push('/login');
         } catch (error) {
             setError(error.message);
         }

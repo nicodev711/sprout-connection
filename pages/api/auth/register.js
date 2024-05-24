@@ -5,7 +5,8 @@ import { signToken } from '@/lib/jwt';
 import cookie from 'cookie';
 
 export default async function handler(req, res) {
-    console.log('Request method:', req.method); // Debugging log
+    console.log('Request method:', req.method);
+    console.log('Request body:', req.body);
 
     if (req.method !== 'POST') {
         console.log('Method not allowed');
@@ -15,6 +16,7 @@ export default async function handler(req, res) {
     const { username, email, password, isGardener } = req.body;
 
     if (!username || !email || !password) {
+        console.log('Missing fields:', { username, email, password });
         return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
