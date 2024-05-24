@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google';
 import JoinCommunity from '@/components/JoinCommunity';
 import ComingSoon from '@/components/ComingSoon';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   return (
@@ -75,9 +74,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 text-center">
-          <h2 className="text-3xl font-bold">Featured Products</h2>
-          <ComingSoon />
+        {/*<section className="py-16 text-center">*/}
+        {/*  <h2 className="text-3xl font-bold">Featured Products</h2>*/}
+        {/*  */}
           {/* Uncomment and use Next.js Image component for featured products
         <div className="flex flex-wrap justify-center mt-8 space-x-4">
           <div className="card w-64 bg-white shadow-lg">
@@ -100,7 +99,7 @@ export default function Home() {
           </div>
         </div>
         */}
-        </section>
+        {/*</section>*/}
 
         <JoinCommunity />
       </div>
