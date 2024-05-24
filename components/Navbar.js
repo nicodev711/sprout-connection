@@ -1,9 +1,9 @@
-// components/Navbar.js
-import {useUser} from '@/contexts/UserContext';
+import { useUser } from '@/contexts/UserContext';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Navbar = () => {
-    const {user, logout} = useUser();
+    const { user, logout } = useUser();
 
     return (
         <div className="navbar bg-secondary">
@@ -45,13 +45,18 @@ const Navbar = () => {
             {user ? (
                 <div className="navbar-end">
                     <ul className="menu menu-horizontal px-1">
-                        <li><Link href={'/dashboard'}>Dashboard</Link></li>
+                        <li><Link href="/dashboard">Dashboard</Link></li>
                     </ul>
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full">
-                                <img alt="User Avatar"
-                                     src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"/>
+                            <div className="w-10 rounded-full relative">
+                                <Image
+                                    alt="User Avatar"
+                                    src="/avatar.png"
+                                    layout="fill"
+                                    objectFit="cover"
+                                    className="rounded-full"
+                                />
                             </div>
                         </div>
                         <ul tabIndex={0}
