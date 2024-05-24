@@ -5,7 +5,10 @@ import { signToken } from '@/lib/jwt';
 import cookie from 'cookie';
 
 export default async function handler(req, res) {
+    console.log('Request method:', req.method); // Debugging log
+
     if (req.method !== 'POST') {
+        console.log('Method not allowed');
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
