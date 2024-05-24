@@ -32,7 +32,7 @@ const Navbar = () => {
                 <Link href="/" className="text-sm sm:text-xl">
                     <Image src={'/logo-noBackground - Copy.png'} alt={'logo'} width={50} height={50} className={'ml-5'}/>
                 </Link>
-                <h2 className="text-sm ml-10 font-bold sm:text-xl">Sprout Connection</h2>
+                <h2 className="text-sm ml-10 font-bold sm:text-xl">Sprout Connections</h2>
             </div>
             <div className="navbar-center hidden lg:flex">
                 <div className="form-control">
