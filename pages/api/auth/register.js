@@ -22,28 +22,32 @@ export default async function handler(req, res) {
     }
 
     try {
-        console.log('Connecting to database...');
+        console.time('Database connection');
         await connectToDatabase();
-        console.log('Connected to database.');
+        console.timeEnd('Database connection');
 
-        console.log('Checking for existing user...');
+        console.time('Check existing user');
         const existingUser = await User.findOne({ email });
+        console.timeEnd('Check existing user');
 
         if (existingUser) {
             console.log('User already exists.');
             return res.status(409).json({ error: 'User already exists' });
         }
 
-        console.log('Hashing password...');
+        console.time('Hash password');
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.timeEnd('Hash password');
 
-        console.log('Creating user...');
+        console.time('Create user');
         const user = await User.create({ username, email, password: hashedPassword, isGardener });
+        console.timeEnd('Create user');
 
-        console.log('Signing token...');
+        console.time('Sign token');
         const token = await signToken({ userId: user._id });
+        console.timeEnd('Sign token');
 
-        console.log('Setting cookie...');
+        console.time('Set cookie');
         res.setHeader('Set-Cookie', cookie.serialize('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
@@ -51,6 +55,7 @@ export default async function handler(req, res) {
             sameSite: 'strict',
             path: '/'
         }));
+        console.timeEnd('Set cookie');
 
         console.log('User created successfully.');
         res.status(201).json({ message: 'User created', userId: user._id });
