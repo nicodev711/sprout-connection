@@ -13,25 +13,23 @@ export default function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Basic form validation
-        if (!email || !username || !password) {
-            setError('All fields are required');
-            return;
-        }
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password, isGardener }),
+            });
 
-        const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, email, password, isGardener }),
-        });
+            if (!res.ok) {
+                const result = await res.json();
+                throw new Error(result.error || 'Failed to register');
+            }
 
-        if (res.ok) {
             router.push('/login');
-        } else {
-            const result = await res.json();
-            setError(result.message || 'Failed to register');
+        } catch (error) {
+            setError(error.message);
         }
     };
 
@@ -46,17 +44,15 @@ export default function Register() {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        required
                     />
                 </div>
                 <div>
                     <label htmlFor="email">Email</label>
                     <input
                         id="email"
-                        type="email"
+                        type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
                     />
                 </div>
                 <div>
@@ -66,7 +62,6 @@ export default function Register() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                     />
                 </div>
                 <div>
@@ -78,7 +73,7 @@ export default function Register() {
                         onChange={(e) => setIsGardener(e.target.checked)}
                     />
                 </div>
-                {error && <p style={{color: 'red'}}>{error}</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
                 <button type="submit">Register</button>
             </form>
         </div>

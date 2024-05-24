@@ -12,24 +12,32 @@ export default async function handler(req, res) {
     const { username, email, password, isGardener } = req.body;
 
     if (!username || !email || !password) {
-        return res.status(400).json({ message: 'Username, email, and password are required' });
+        return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
     try {
+        console.log('Connecting to database...');
         await connectToDatabase();
+        console.log('Connected to database.');
 
+        console.log('Checking for existing user...');
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            return res.status(409).json({ message: 'User already exists' });
+            console.log('User already exists.');
+            return res.status(409).json({ error: 'User already exists' });
         }
 
+        console.log('Hashing password...');
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        console.log('Creating user...');
         const user = await User.create({ username, email, password: hashedPassword, isGardener });
 
+        console.log('Signing token...');
         const token = await signToken({ userId: user._id });
 
+        console.log('Setting cookie...');
         res.setHeader('Set-Cookie', cookie.serialize('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
@@ -38,9 +46,10 @@ export default async function handler(req, res) {
             path: '/'
         }));
 
+        console.log('User created successfully.');
         res.status(201).json({ message: 'User created', userId: user._id });
     } catch (error) {
         console.error('Error during user registration:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
