@@ -9,8 +9,11 @@ export default async function handler(req, res) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
+    console.log('Cookies:', req.headers.cookie); // Debugging log to check cookies
+
     const { token } = cookie.parse(req.headers.cookie || '');
     if (!token) {
+        console.log('No token found'); // Debugging log for missing token
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
