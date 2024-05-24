@@ -6,13 +6,13 @@ import cookie from 'cookie';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).end();
+        return res.status(405).json({ message: 'Method not allowed' });
     }
 
     const { username, email, password, isGardener } = req.body;
 
     if (!username || !email || !password) {
-        return res.status(400).json({ error: 'Username, email, and password are required' });
+        return res.status(400).json({ message: 'Username, email, and password are required' });
     }
 
     try {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            return res.status(409).json({ error: 'User already exists' });
+            return res.status(409).json({ message: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,6 +41,6 @@ export default async function handler(req, res) {
         res.status(201).json({ message: 'User created', userId: user._id });
     } catch (error) {
         console.error('Error during user registration:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
