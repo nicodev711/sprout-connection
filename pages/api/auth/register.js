@@ -6,6 +6,7 @@ import cookie from 'cookie';
 
 export default async function handler(req, res) {
     console.log('Request method:', req.method);
+    console.log('Request headers:', req.headers);
     console.log('Request body:', req.body);
 
     if (req.method !== 'POST') {
@@ -54,7 +55,8 @@ export default async function handler(req, res) {
         console.log('User created successfully.');
         res.status(201).json({ message: 'User created', userId: user._id });
     } catch (error) {
-        console.error('Error during user registration:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error during user registration:', error.message);
+        console.error('Error stack:', error.stack);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 }
