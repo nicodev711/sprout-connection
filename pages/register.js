@@ -14,7 +14,7 @@ export default function Register() {
         e.preventDefault();
 
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await axios('/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
