@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Link from "next/link";
 
 export default function Register() {
     const [email, setEmail] = useState('');
@@ -32,48 +33,61 @@ export default function Register() {
     };
 
     return (
-        <div>
-            <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="username">Username</label>
-                    <input
-                        id="username"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="text"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="isGardener">Register as Gardener</label>
-                    <input
-                        id="isGardener"
-                        type="checkbox"
-                        checked={isGardener}
-                        onChange={(e) => setIsGardener(e.target.checked)}
-                    />
-                </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Register</button>
-            </form>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+                <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Register</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-4 flex items-center">
+                        <input
+                            id="isGardener"
+                            type="checkbox"
+                            className="mr-2"
+                            checked={isGardener}
+                            onChange={(e) => setIsGardener(e.target.checked)}
+                        />
+                        <label htmlFor="isGardener" className="text-gray-700">Register as Gardener</label>
+                    </div>
+                    {error && <p className="text-red-500 mb-4">{error}</p>}
+                    <button type="submit"
+                            className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
+                        Register
+                    </button>
+                </form>
+                <p className="mt-4 text-center">Already having an account? <Link href="/login" className="text-green-600 hover:underline">Login</Link></p>
+            </div>
         </div>
     );
 }

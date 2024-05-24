@@ -42,44 +42,44 @@ const Navbar = () => {
                     />
                 </div>
             </div>
-            {user ? (
-                <div className="navbar-end">
-                    <ul className="menu menu-horizontal px-1">
-                        <li><Link href="/dashboard">Dashboard</Link></li>
-                    </ul>
-                    <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full relative">
-                                <Image
-                                    alt="User Avatar"
-                                    src="/avatar.png"
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="rounded-full"
-                                />
-                            </div>
-                        </div>
-                        <ul tabIndex={0}
-                            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                            <li>
-                                <Link href="/profile" className="justify-between">
-                                    Profile
-                                    <span className="badge">New</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <a onClick={logout}>Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            ) : (
-                <div className="navbar-end">
-                    <Link href="/login" className="btn">
-                        Login
-                    </Link>
-                </div>
-            )}
+            {/*{user ? (*/}
+            {/*    <div className="navbar-end">*/}
+            {/*        <ul className="menu menu-horizontal px-1">*/}
+            {/*            <li><Link href="/dashboard">Dashboard</Link></li>*/}
+            {/*        </ul>*/}
+            {/*        <div className="dropdown dropdown-end">*/}
+            {/*            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">*/}
+            {/*                <div className="w-10 rounded-full relative">*/}
+            {/*                    <Image*/}
+            {/*                        alt="User Avatar"*/}
+            {/*                        src="/avatar.png"*/}
+            {/*                        layout="fill"*/}
+            {/*                        objectFit="cover"*/}
+            {/*                        className="rounded-full"*/}
+            {/*                    />*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*            <ul tabIndex={0}*/}
+            {/*                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">*/}
+            {/*                <li>*/}
+            {/*                    <Link href="/profile" className="justify-between">*/}
+            {/*                        Profile*/}
+            {/*                        <span className="badge">New</span>*/}
+            {/*                    </Link>*/}
+            {/*                </li>*/}
+            {/*                <li>*/}
+            {/*                    <a onClick={logout}>Logout</a>*/}
+            {/*                </li>*/}
+            {/*            </ul>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*) : (*/}
+            {/*    <div className="navbar-end">*/}
+            {/*        <Link href="/login" className="btn">*/}
+            {/*            Login*/}
+            {/*        </Link>*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     );
 };
