@@ -1,6 +1,7 @@
 // pages/register.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from "axios";
 
 export default function Register() {
     const [email, setEmail] = useState('');
