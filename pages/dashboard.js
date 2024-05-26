@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from "next/link";
+import Support from "@/components/dashboard/Support";
+import PressRelease from "@/components/dashboard/PressRelease";
+import QuickActions from "@/components/dashboard/QuickActions";
+import Statistics from "@/components/dashboard/Statistics";
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -30,7 +34,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <section className="bg-white p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold">Profile Information</h2>
-                <p>Name: {user.name}</p>
+                <p>Name: {user.firstName}</p>
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
@@ -42,29 +46,8 @@ export default function Dashboard() {
                     <li>New message from User X</li>
                 </ul>
             </section>
-            <section className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold">Quick Actions</h2>
-                <button className="btn btn-accent mt-2">Add New Product</button>
-                <button className="btn btn-accent mt-2">View Messages</button>
-                <button className="btn btn-accent mt-2">Manage Settings</button>
-            </section>
-            <section className="col-span-1 md:col-span-2 bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold">Statistics</h2>
-                <div className="flex justify-around mt-4">
-                    <div>
-                        <h3 className="text-lg font-semibold">Products Listed</h3>
-                        <p>10</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold">Sales Made</h3>
-                        <p>5</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold">Messages</h3>
-                        <p>3</p>
-                    </div>
-                </div>
-            </section>
+            <QuickActions user={user} />
+            <Statistics/>
         </div>
     );
 
@@ -72,7 +55,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <section className="bg-white p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold">Profile Information</h2>
-                <p>Name: {user.name}</p>
+                <p>Name: {user.firstName}</p>
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
@@ -104,11 +87,9 @@ export default function Dashboard() {
                     <>
                         {user.isGardener ? renderGardenerDashboard() : renderBuyerDashboard()}
 
-                        <section className="col-span-1 md:col-span-3 bg-white p-4 rounded-lg shadow-md mt-4">
-                            <h2 className="text-xl font-bold">Support and Help</h2>
-                            <p>If you need any help, please contact our support team.</p>
-                            <button className="btn btn-primary mt-2">Contact Support</button>
-                        </section>
+                        <PressRelease/>
+
+                        <Support/>
                     </>
                 ) : (
                     <p>Please log in to access the dashboard.</p>

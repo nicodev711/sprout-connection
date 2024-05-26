@@ -12,7 +12,6 @@ export const UserProvider = ({ children }) => {
         const res = await fetch('/api/auth/me', { cache: 'no-store' });
         if (res.ok) {
             const data = await res.json();
-            console.log('Fetched user:', data.user);  // Debugging log
             setUser(data.user);
         } else {
             setUser(null);
@@ -33,7 +32,7 @@ export const UserProvider = ({ children }) => {
 
         if (res.ok) {
             setUser(null);
-            router.push('/login');
+            router.push('/');
         }
     };
 
