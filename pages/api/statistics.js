@@ -4,7 +4,7 @@ import Product from '@/models/Product';
 // import Message from '@/models/Message'; // Assuming you have a Message model
 import { authMiddleware } from '@/lib/middleware';
 
-const handler = async (req, res) => {
+const statsHandler = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -29,4 +29,8 @@ const handler = async (req, res) => {
     }
 };
 
-export default (req, res) => authMiddleware(req, res, () => handler(req, res));
+const handler = async (req, res) => {
+    await authMiddleware(req, res, statsHandler);
+};
+
+export default handler;

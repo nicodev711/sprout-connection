@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Search() {
     const router = useRouter();
@@ -33,7 +34,7 @@ export default function Search() {
                     {results.map((result) => (
                         <Link key={result._id} href={`/products/${result._id}`}>
                             <div key={result.id} className="card card-compact w-96 bg-base-100 shadow-xl">
-                                <figure><img src={result.imageCDNLink} alt={result.title}/></figure>
+                                <figure><Image src={result.imageCDNLink} alt={result.title}/></figure>
                                 <div className="card-body">
                                     <h2 className="card-title">{result.title}</h2>
                                     <p>{result.description}</p>

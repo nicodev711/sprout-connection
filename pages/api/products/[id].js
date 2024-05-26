@@ -2,7 +2,7 @@ import connectToDatabase from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { authMiddleware } from '@/lib/middleware';
 
-const handler = async (req, res) => {
+const idHandler = async (req, res) => {
     await connectToDatabase();
     const { id } = req.query;
 
@@ -41,4 +41,8 @@ const handler = async (req, res) => {
     }
 }
 
-export default (req, res) => authMiddleware(req, res, () => handler(req, res));
+const handler = async (req, res) => {
+    await authMiddleware(req, res, idHandler);
+};
+
+export default handler;

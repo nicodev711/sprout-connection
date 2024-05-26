@@ -1,4 +1,3 @@
-// pages/api/checkout.js
 import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Basket from '@/models/Basket';
@@ -28,24 +27,21 @@ const checkoutHandler = async (req, res) => {
             quantity: item.quantity,
         }));
 
-        // Calculate total amount, service fee, and small order fee
         const totalAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
         const serviceFee = totalAmount * 0.05;
         const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
 
-        // Add service fee as a separate line item
         lineItems.push({
             price_data: {
                 currency: 'usd',
                 product_data: {
                     name: 'Service Fee',
                 },
-                unit_amount: Math.round(serviceFee * 100), // Convert to cents
+                unit_amount: Math.round(serviceFee * 100),
             },
             quantity: 1,
         });
 
-        // Add small order fee as a separate line item if applicable
         if (smallOrderFee > 0) {
             lineItems.push({
                 price_data: {
@@ -53,7 +49,7 @@ const checkoutHandler = async (req, res) => {
                     product_data: {
                         name: 'Small Order Fee',
                     },
-                    unit_amount: Math.round(smallOrderFee * 100), // Convert to cents
+                    unit_amount: Math.round(smallOrderFee * 100),
                 },
                 quantity: 1,
             });
@@ -74,6 +70,8 @@ const checkoutHandler = async (req, res) => {
     }
 };
 
-export default async (req, res) => {
+const handler = async (req, res) => {
     await authMiddleware(req, res, checkoutHandler);
 };
+
+export default handler;
