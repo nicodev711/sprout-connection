@@ -108,7 +108,7 @@ export default function QuickActions({ user }) {
                 ) : (
                     <>
                         <Link href={"/products/add"} className="btn btn-accent">Add New Product</Link>
-                        <Link href={"/products/add"} className="btn btn-accent">Manage Products</Link>
+                        <Link href={"/products/manage"} className="btn btn-accent">Manage Products</Link>
                         <button className="btn btn-accent" disabled>View Messages</button>
                         <button className="btn btn-accent" disabled>Manage Settings</button>
                     </>
