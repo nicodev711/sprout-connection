@@ -2,13 +2,14 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
-import EventBus from "@/utils/eventBus";
+import { useUser } from '@/contexts/UserContext';
 
 export default function ProductDetails() {
     const router = useRouter();
     const { id } = router.query;
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const { addToBasket } = useUser();
 
     useEffect(() => {
         if (id) {
@@ -28,20 +29,8 @@ export default function ProductDetails() {
     if (!product) return <p>Loading...</p>;
 
     const handleAddToBasket = () => {
-        const storedBasket = JSON.parse(localStorage.getItem('basket')) || [];
-        const existingItemIndex = storedBasket.findIndex(item => item._id === product._id);
-
-        if (existingItemIndex >= 0) {
-            storedBasket[existingItemIndex].quantity += quantity;
-        } else {
-            storedBasket.push({ ...product, quantity });
-        }
-
-        localStorage.setItem('basket', JSON.stringify(storedBasket));
-        const newBasketCount = storedBasket.reduce((total, item) => total + item.quantity, 0);
-        EventBus.dispatch('basketUpdated', newBasketCount);
-
-        alert(`Added ${quantity} ${product.units} of ${product.title} to the basket!`);
+        addToBasket(product, quantity);
+        //alert(`Added ${quantity} ${product.units} of ${product.title} to the basket!`);
     };
 
     return (
@@ -73,7 +62,7 @@ export default function ProductDetails() {
                             value={quantity}
                             min="1"
                             max={product.quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
+                            onChange={(e) => setQuantity(Number(e.target.value))}
                         />
                     </div>
                     <button

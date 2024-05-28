@@ -1,67 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useUser } from '@/contexts/UserContext';
+import axios from 'axios';
 
 const Basket = () => {
-    const [basket, setBasket] = useState([]);
+    const { basket } = useUser();
     const router = useRouter();
 
-    useEffect(() => {
-        const storedBasket = JSON.parse(localStorage.getItem('basket')) || [];
-        setBasket(storedBasket);
-    }, []);
-
-    const handleQuantityChange = (index, quantity) => {
-        const updatedBasket = [...basket];
-        updatedBasket[index].quantity = quantity;
-        setBasket(updatedBasket);
-        localStorage.setItem('basket', JSON.stringify(updatedBasket));
+    const calculateTotal = () => {
+        if (!basket || basket.length === 0) return 0;
+        return basket.reduce((total, item) => total + item.price * item.quantity, 0);
     };
 
-    const handleRemoveItem = (index) => {
-        const updatedBasket = basket.filter((_, i) => i !== index);
-        setBasket(updatedBasket);
-        localStorage.setItem('basket', JSON.stringify(updatedBasket));
-    };
+    const totalAmount = calculateTotal();
+    const serviceFee = totalAmount * 0.05;
+    const finalAmount = totalAmount + serviceFee;
 
-    const handleCheckout = () => {
-        router.push('/checkout');
+    const handleCheckout = async () => {
+        try {
+            const { data } = await axios.post('/api/checkout', {}, { withCredentials: true });
+            router.push(data.url);
+        } catch (error) {
+            console.error('Failed to redirect to Stripe checkout:', error);
+        }
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-4">Your Basket</h1>
-            {basket.length === 0 ? (
-                <p>Your basket is empty.</p>
-            ) : (
-                <div>
-                    {basket.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center p-4 bg-white shadow-lg rounded-lg mb-4">
-                            <div className="flex items-center">
-                                <img src={item.imageCDNLink} alt={item.title} className="w-16 h-16 rounded-lg mr-4" />
+        <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
+            <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg">
+                <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Basket</h1>
+                <ul className="space-y-4">
+                    {basket && basket.length > 0 ? (
+                        basket.map((item, index) => (
+                            <li key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
                                 <div>
-                                    <h2 className="text-xl font-semibold">{item.title}</h2>
-                                    <p>${item.price} per {item.units}</p>
+                                    <h2 className="text-lg font-semibold">{item.title}</h2>
+                                    <p className="text-sm text-gray-600">${item.price} x {item.quantity}</p>
                                 </div>
+                                <p className="text-lg font-bold text-gray-800">
+                                    ${item.price * item.quantity}
+                                </p>
+                            </li>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500">Your basket is empty</p>
+                    )}
+                </ul>
+                {basket && basket.length > 0 && (
+                    <>
+                        <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <div className="flex justify-between items-center mb-2">
+                                <p className="text-lg font-semibold">Total Amount</p>
+                                <p className="text-lg font-bold text-gray-800">${totalAmount.toFixed(2)}</p>
                             </div>
-                            <div className="flex items-center">
-                                <input
-                                    type="number"
-                                    min="1"
-                                    className="input input-bordered w-16 mr-4"
-                                    value={item.quantity}
-                                    onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
-                                />
-                                <button className="btn btn-error" onClick={() => handleRemoveItem(index)}>
-                                    Remove
-                                </button>
+                            <div className="flex justify-between items-center mb-2">
+                                <p className="text-lg font-semibold">Service Fee (5%)</p>
+                                <p className="text-lg font-bold text-gray-800">${serviceFee.toFixed(2)}</p>
+                            </div>
+                            <div className="flex justify-between items-center border-t pt-2">
+                                <p className="text-lg font-semibold">Final Amount</p>
+                                <p className="text-lg font-bold text-gray-800">${finalAmount.toFixed(2)}</p>
                             </div>
                         </div>
-                    ))}
-                    <button className="btn btn-primary w-full mt-4" onClick={handleCheckout}>
-                        Proceed to Checkout
-                    </button>
-                </div>
-            )}
+                        <div className="mt-6 flex justify-center">
+                            <button onClick={handleCheckout} className="btn btn-primary px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600 transition duration-300">
+                                Proceed to Checkout
+                            </button>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 };
