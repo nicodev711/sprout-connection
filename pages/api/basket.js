@@ -15,7 +15,7 @@ const basketHandler = async (req, res) => {
                 { userId },
                 { items: basket },
                 { new: true, upsert: true }
-            );
+            ).populate('items.productId');  // Ensure product details are populated
             return res.status(200).json(updatedBasket);
         } catch (error) {
             console.error('Failed to save basket:', error);
