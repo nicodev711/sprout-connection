@@ -34,7 +34,7 @@ export default function Search() {
                     {results.map((result) => (
                         <Link key={result._id} href={`/products/${result._id}`}>
                             <div key={result.id} className="card card-compact w-96 bg-base-100 shadow-xl">
-                                <figure><Image src={result.imageCDNLink} alt={result.title}/></figure>
+                                <figure><Image src={result.imageCDNLink} alt={result.title} width="500" height="500"/></figure>
                                 <div className="card-body">
                                     <h2 className="card-title">{result.title}</h2>
                                     <p>{result.description}</p>

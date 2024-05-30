@@ -5,13 +5,38 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 
 const Basket = () => {
-    const { basket } = useUser();
+    const { basket, updateItemQuantity, removeItemFromBasket } = useUser();
     const router = useRouter();
+    const [loading, setLoading] = useState(true);
 
-    // Calculate total, service fee, and final amount
+    useEffect(() => {
+        if (basket) {
+            console.log("Basket data:", basket);
+            setLoading(false);
+        }
+    }, [basket]);
+
     const calculateTotal = () => {
         if (!basket || !Array.isArray(basket)) return 0;
-        return basket.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+        return basket.reduce((total, item) => {
+            const price = parseFloat(item.price || 0);
+            const quantity = parseInt(item.quantity, 10);
+            if (isNaN(price) || isNaN(quantity)) {
+                console.warn('Invalid price or quantity:', { price, quantity });
+                return total;
+            }
+            return total + (price * quantity);
+        }, 0);
+    };
+
+    const handleQuantityChange = (index, quantity) => {
+        const productId = basket[index].productId;
+        updateItemQuantity(productId, quantity);
+    };
+
+    const handleRemoveItem = (index) => {
+        const productId = basket[index].productId;
+        removeItemFromBasket(productId);
     };
 
     const totalAmount = calculateTotal();
@@ -22,11 +47,24 @@ const Basket = () => {
     const handleCheckout = async () => {
         try {
             const { data } = await axios.post('/api/checkout', {}, { withCredentials: true });
-            router.push(data.url);
+            if (data && data.url) {
+                await router.push(data.url);
+            }
         } catch (error) {
             console.error('Failed to redirect to Stripe checkout:', error);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+                <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-center">
+                    <h1 className="text-2xl font-bold mb-6 text-green-600">Loading your basket...</h1>
+                    <p className="text-gray-500">Please wait a moment.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
@@ -44,12 +82,26 @@ const Basket = () => {
                         basket.map((item, index) => (
                             <li key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
                                 <div>
-                                    <h2 className="text-lg font-semibold">{item.productId.title}</h2>
-                                    <p className="text-sm text-gray-600">${item.productId.price} x {item.quantity}</p>
+                                    <h2 className="text-lg font-semibold">{item.title}</h2>
+                                    <p className="text-sm text-gray-600">${item.price} x {item.quantity}</p>
+                                    <div className="flex items-center mt-2">
+                                        <label htmlFor={`quantity-${index}`} className="mr-2">Quantity:</label>
+                                        <input
+                                            type="number"
+                                            id={`quantity-${index}`}
+                                            value={item.quantity}
+                                            onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
+                                            min="1"
+                                            className="w-16 p-1 border rounded"
+                                        />
+                                    </div>
                                 </div>
-                                <p className="text-lg font-bold text-gray-800">
-                                    ${item.productId.price * item.quantity}
-                                </p>
+                                <button
+                                    onClick={() => handleRemoveItem(index)}
+                                    className="ml-4 text-red-500 hover:underline"
+                                >
+                                    Remove
+                                </button>
                             </li>
                         ))
                     ) : (

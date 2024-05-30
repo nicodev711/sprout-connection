@@ -16,33 +16,35 @@ const idHandler = async (req, res) => {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch product' });
         }
-    } else if (req.method === 'PUT') {
-        const { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink } = req.body;
+    } else if (req.method === 'PUT' || req.method === 'DELETE') {
+        await authMiddleware(req, res, async () => {
+            if (req.method === 'PUT') {
+                const { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink } = req.body;
 
-        try {
-            const updatedProduct = await Product.findByIdAndUpdate(
-                id,
-                { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink },
-                { new: true }
-            );
-            res.status(200).json(updatedProduct);
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to update product' });
-        }
-    } else if (req.method === 'DELETE') {
-        try {
-            await Product.findByIdAndDelete(id);
-            res.status(204).end();
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to delete product' });
-        }
+                try {
+                    const updatedProduct = await Product.findByIdAndUpdate(
+                        id,
+                        { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink },
+                        { new: true }
+                    );
+                    res.status(200).json(updatedProduct);
+                } catch (error) {
+                    res.status(500).json({ error: 'Failed to update product' });
+                }
+            } else if (req.method === 'DELETE') {
+                try {
+                    await Product.findByIdAndDelete(id);
+                    res.status(204).end();
+                } catch (error) {
+                    res.status(500).json({ error: 'Failed to delete product' });
+                }
+            } else {
+                res.status(405).json({ error: 'Method not allowed' });
+            }
+        });
     } else {
         res.status(405).json({ error: 'Method not allowed' });
     }
-}
-
-const handler = async (req, res) => {
-    await authMiddleware(req, res, idHandler);
 };
 
-export default handler;
+export default idHandler;

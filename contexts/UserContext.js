@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const UserContext = createContext();
 
@@ -8,17 +9,39 @@ export const UserProvider = ({ children }) => {
     const [basket, setBasket] = useState([]);
     const router = useRouter();
 
-    const addToBasket = (product, quantity) => {
-        setBasket((prevBasket) => {
-            const existingItemIndex = prevBasket.findIndex(item => item.productId === product._id);
-            if (existingItemIndex >= 0) {
-                const newBasket = [...prevBasket];
-                newBasket[existingItemIndex].quantity += quantity;
-                return newBasket;
-            } else {
-                return [...prevBasket, { productId: product._id, title: product.title, price: product.price, quantity }];
-            }
-        });
+    const addToBasket = async (product, quantity) => {
+        // Fetch product details to ensure full population
+        try {
+            const response = await axios.get(`/api/products/${product._id}`);
+            const fullProduct = response.data;
+
+            setBasket((prevBasket) => {
+                const existingItemIndex = prevBasket.findIndex(item => item.productId === product._id);
+                if (existingItemIndex >= 0) {
+                    const newBasket = [...prevBasket];
+                    newBasket[existingItemIndex].quantity += quantity;
+                    return newBasket;
+                } else {
+                    return [...prevBasket, { productId: product._id, title: fullProduct.title, price: fullProduct.price, quantity }];
+                }
+            });
+        } catch (error) {
+            console.error('Failed to fetch product details:', error);
+        }
+    };
+
+    const updateItemQuantity = (productId, quantity) => {
+        setBasket((prevBasket) =>
+            prevBasket.map(item =>
+                item.productId === productId ? { ...item, quantity } : item
+            )
+        );
+    };
+
+    const removeItemFromBasket = (productId) => {
+        setBasket((prevBasket) =>
+            prevBasket.filter(item => item.productId !== productId)
+        );
     };
 
     const clearBasket = () => {
@@ -55,7 +78,7 @@ export const UserProvider = ({ children }) => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setBasket(data.items || []); // Ensure basket is always an array
+                    setBasket(data.items || []);
                 } else {
                     throw new Error('Failed to load basket');
                 }
@@ -102,12 +125,12 @@ export const UserProvider = ({ children }) => {
         if (res.ok) {
             setUser(null);
             setBasket([]);
-            router.push('/');
+            await router.push('/');
         }
     };
 
     return (
-        <UserContext.Provider value={{ user, setUser, logout, fetchUser, basket, addToBasket, clearBasket }}>
+        <UserContext.Provider value={{ user, setUser, logout, fetchUser, basket, addToBasket, updateItemQuantity, removeItemFromBasket, clearBasket }}>
             {children}
         </UserContext.Provider>
     );

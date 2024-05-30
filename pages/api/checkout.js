@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const checkoutHandler = async (req, res) => {
     await dbConnect();
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     try {
         const userBasket = await Basket.findOne({ userId }).populate('items.productId');
