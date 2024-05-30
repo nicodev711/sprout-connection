@@ -1,3 +1,4 @@
+// pages/api/checkout.js
 import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Basket from '@/models/Basket';
@@ -15,7 +16,15 @@ const checkoutHandler = async (req, res) => {
         const userBasket = await Basket.findOne({ userId }).populate('items.productId');
 
         if (!userBasket || userBasket.items.length === 0) {
+            console.error('Basket is empty or not found');
             return res.status(400).json({ error: 'Basket is empty' });
+        }
+
+        const gardenerIds = [...new Set(userBasket.items.map(item => item.productId.userId.toString()))];
+
+        if (gardenerIds.length === 0) {
+            console.error('No gardener IDs found');
+            return res.status(400).json({ error: 'No gardener IDs found' });
         }
 
         const lineItems = userBasket.items.map(item => ({
@@ -29,9 +38,10 @@ const checkoutHandler = async (req, res) => {
             quantity: item.quantity,
         }));
 
-        const totalAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-        const serviceFee = totalAmount * 0.1;
-        const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
+        const totalProductAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
+        const serviceFee = (totalProductAmount * 0.1).toFixed(2);
+        const smallOrderFee = totalProductAmount < 5 ? 0.30 : 0;
+        const total = (parseFloat(totalProductAmount) + parseFloat(serviceFee) + parseFloat(smallOrderFee)).toFixed(2);
 
         lineItems.push({
             price_data: {
@@ -57,22 +67,36 @@ const checkoutHandler = async (req, res) => {
             });
         }
 
+        const gardener = await User.findById(gardenerIds[0]);
+        if (!gardener) {
+            console.error('Gardener not found');
+            return res.status(400).json({ error: 'Gardener not found' });
+        }
+
+        if (!gardener.stripeAccountId) {
+            console.error('Gardener does not have a Stripe account');
+            return res.status(400).json({ error: 'Gardener does not have a Stripe account' });
+        }
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
             success_url: `${req.headers.origin}/success`,
             cancel_url: `${req.headers.origin}/cancel`,
+            payment_intent_data: {
+                application_fee_amount: Math.round((parseFloat(serviceFee) + parseFloat(smallOrderFee)) * 100), // Platform fee in cents
+                transfer_data: {
+                    destination: gardener.stripeAccountId,
+                },
+            },
         });
 
         // Create order here
-        const gardenerIds = [...new Set(userBasket.items.map(item => item.productId.userId))];
         const products = userBasket.items.map(item => ({
             productId: item.productId._id,
             quantity: item.quantity,
         }));
-        const totalProductAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
-        const total = (parseFloat(totalProductAmount) + parseFloat(serviceFee) + parseFloat(smallOrderFee)).toFixed(2);
 
         const order = new Order({
             buyerId: userId,

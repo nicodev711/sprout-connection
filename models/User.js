@@ -29,9 +29,16 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    stripeAccountId: {
+        type: String,
+    },
     withdrawableAmount: {
         type: Number,
-        default: 0.00,
+        default: 0,
+    },
+    totalEarnings: {
+        type: Number,
+        default: 0,
     },
 });
 
