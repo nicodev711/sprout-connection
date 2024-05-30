@@ -18,7 +18,7 @@ const checkoutHandler = async (req, res) => {
 
         const lineItems = userBasket.items.map(item => ({
             price_data: {
-                currency: 'usd',
+                currency: 'gbp',
                 product_data: {
                     name: item.productId.title,
                 },

@@ -113,21 +113,21 @@ const Basket = () => {
                         <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm">
                             <div className="flex justify-between items-center mb-2">
                                 <p className="text-lg font-semibold">Total Amount</p>
-                                <p className="text-lg font-bold text-gray-800">${totalAmount.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-800">£{totalAmount.toFixed(2)}</p>
                             </div>
                             <div className="flex justify-between items-center mb-2">
-                                <p className="text-lg font-semibold">Service Fee (5%)</p>
-                                <p className="text-lg font-bold text-gray-800">${serviceFee.toFixed(2)}</p>
+                                <p className="text-lg font-semibold">Service Fee</p>
+                                <p className="text-lg font-bold text-gray-800">£{serviceFee.toFixed(2)}</p>
                             </div>
                             {smallOrderFee > 0 && (
                                 <div className="flex justify-between items-center mb-2">
                                     <p className="text-lg font-semibold">Small Order Fee</p>
-                                    <p className="text-lg font-bold text-gray-800">${smallOrderFee.toFixed(2)}</p>
+                                    <p className="text-lg font-bold text-gray-800">£{smallOrderFee.toFixed(2)}</p>
                                 </div>
                             )}
                             <div className="flex justify-between items-center border-t pt-2">
                                 <p className="text-lg font-semibold">Final Amount</p>
-                                <p className="text-lg font-bold text-gray-800">${finalAmount.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-800">£{finalAmount.toFixed(2)}</p>
                             </div>
                         </div>
                         <div className="mt-6 flex justify-center">

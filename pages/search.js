@@ -38,7 +38,7 @@ export default function Search() {
                                 <div className="card-body">
                                     <h2 className="card-title">{result.title}</h2>
                                     <p>{result.description}</p>
-                                    <p className="text-lg font-semibold">${result.price}</p>
+                                    <p className="text-lg font-semibold">£{result.price}</p>
                                     <div className="card-actions justify-end">
                                         <button className="btn btn-primary">Buy Now</button>
                                     </div>
