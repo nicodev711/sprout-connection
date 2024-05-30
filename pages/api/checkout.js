@@ -28,12 +28,12 @@ const checkoutHandler = async (req, res) => {
         }));
 
         const totalAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-        const serviceFee = totalAmount * 0.05;
+        const serviceFee = totalAmount * 0.1;
         const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
 
         lineItems.push({
             price_data: {
-                currency: 'usd',
+                currency: 'gbp',
                 product_data: {
                     name: 'Service Fee',
                 },
@@ -45,7 +45,7 @@ const checkoutHandler = async (req, res) => {
         if (smallOrderFee > 0) {
             lineItems.push({
                 price_data: {
-                    currency: 'usd',
+                    currency: 'gbp',
                     product_data: {
                         name: 'Small Order Fee',
                     },

@@ -40,7 +40,7 @@ const Basket = () => {
     };
 
     const totalAmount = calculateTotal();
-    const serviceFee = totalAmount * 0.05;
+    const serviceFee = totalAmount * 0.1;
     const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
     const finalAmount = totalAmount + serviceFee + smallOrderFee;
 
@@ -73,7 +73,7 @@ const Basket = () => {
                 {totalAmount < 5 && (
                     <div className="toast mb-4">
                         <div className="alert alert-info">
-                            <span>Your basket total is below $5. Add more items to avoid an extra $0.30 fee.</span>
+                            <span>Your basket total is below £5. Add more items to avoid an extra £0.30 fee.</span>
                         </div>
                     </div>
                 )}
@@ -83,7 +83,7 @@ const Basket = () => {
                             <li key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
                                 <div>
                                     <h2 className="text-lg font-semibold">{item.title}</h2>
-                                    <p className="text-sm text-gray-600">${item.price} x {item.quantity}</p>
+                                    <p className="text-sm text-gray-600">£{item.price} x {item.quantity}</p>
                                     <div className="flex items-center mt-2">
                                         <label htmlFor={`quantity-${index}`} className="mr-2">Quantity:</label>
                                         <input
