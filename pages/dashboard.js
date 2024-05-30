@@ -5,6 +5,8 @@ import Support from "@/components/dashboard/Support";
 import PressRelease from "@/components/dashboard/PressRelease";
 import QuickActions from "@/components/dashboard/QuickActions";
 import Statistics from "@/components/dashboard/Statistics";
+import RecentOrdersBuyer from "@/components/dashboard/RecentOrdersBuyer";
+import RecentOrdersGardener from "@/components/dashboard/RecentOrdersGardener";
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -38,14 +40,7 @@ export default function Dashboard() {
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
-            <section className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold">Recent Activity</h2>
-                <ul>
-                    <li>Product A listed</li>
-                    <li>Product B sold</li>
-                    <li>New message from User X</li>
-                </ul>
-            </section>
+            <RecentOrdersGardener/>
             <QuickActions user={user} />
             <Statistics/>
         </div>
@@ -59,13 +54,7 @@ export default function Dashboard() {
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
-            <section className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold">Recent Orders</h2>
-                <ul>
-                    <li>Order #1234 - Product A</li>
-                    <li>Order #5678 - Product B</li>
-                </ul>
-            </section>
+            <RecentOrdersBuyer/>
             <section className="bg-white p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold">Wishlist</h2>
                 <ul>

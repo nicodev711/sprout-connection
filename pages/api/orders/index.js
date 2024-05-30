@@ -1,4 +1,4 @@
-// pages/api/orders.js
+// pages/api/index.js
 import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
