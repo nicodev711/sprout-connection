@@ -2,32 +2,16 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
-import axios from 'axios';
 import Link from "next/link";
 
 const Success = () => {
-    const { user, basket, clearBasket } = useUser();
+    const { clearBasket } = useUser();
     const router = useRouter();
 
     useEffect(() => {
-        const createOrder = async () => {
-            try {
-                const orderData = {
-                    buyerId: user.userId,
-                    items: basket,
-                    total: basket.reduce((total, item) => total + item.productId.price * item.quantity, 0)
-                };
-                await axios.post('/api/orders', orderData);
-                clearBasket();
-            } catch (error) {
-                console.error('Failed to create order:', error);
-            }
-        };
-
-        if (user && basket.length > 0) {
-            createOrder();
-        }
-    }, [user, basket, clearBasket]);
+        // Clear the basket when the payment is successful
+        clearBasket();
+    }, [clearBasket]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">

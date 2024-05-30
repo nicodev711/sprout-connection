@@ -47,7 +47,7 @@ export default function ManageProducts() {
                             <h3 className="text-lg font-semibold">{product.title}</h3>
                             <p>{product.description}</p>
                             <p>Quantity: {product.quantity} {product.units}</p>
-                            <p>Price: ${product.price}</p>
+                            <p>Price: £{product.price}</p>
                             <div className="flex gap-2 mt-2">
                                 <button className="btn btn-accent" onClick={() => handleEdit(product._id)}>Edit</button>
                                 <button className="btn btn-danger" onClick={() => handleDelete(product._id)}>Delete</button>

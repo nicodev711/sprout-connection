@@ -2,6 +2,8 @@ import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Basket from '@/models/Basket';
 import Stripe from 'stripe';
+import User from "@/models/User";
+import Order from "@/models/Order";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -62,6 +64,35 @@ const checkoutHandler = async (req, res) => {
             success_url: `${req.headers.origin}/success`,
             cancel_url: `${req.headers.origin}/cancel`,
         });
+
+        // Create order here
+        const gardenerIds = [...new Set(userBasket.items.map(item => item.productId.userId))];
+        const products = userBasket.items.map(item => ({
+            productId: item.productId._id,
+            quantity: item.quantity,
+        }));
+        const totalProductAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
+        const total = (parseFloat(totalProductAmount) + parseFloat(serviceFee) + parseFloat(smallOrderFee)).toFixed(2);
+
+        const order = new Order({
+            buyerId: userId,
+            gardenerIds,
+            products,
+            total: parseFloat(total),
+        });
+
+        await order.save();
+
+        // Update the withdrawable amount for each gardener, excluding fees
+        await Promise.all(gardenerIds.map(async gardenerId => {
+            const gardener = await User.findById(gardenerId);
+            if (gardener) {
+                gardener.withdrawableAmount += parseFloat(totalProductAmount);
+                await gardener.save();
+            }
+        }));
+
+        await Basket.deleteOne({ userId });
 
         res.status(200).json({ url: session.url });
     } catch (error) {

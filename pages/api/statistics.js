@@ -1,7 +1,7 @@
+// pages/api/statistics.js
 import connectToDatabase from '@/lib/mongoose';
 import Product from '@/models/Product';
-// import Order from '@/models/Order'; // Assuming you have an Order model
-// import Message from '@/models/Message'; // Assuming you have a Message model
+import User from '@/models/User';
 import { authMiddleware } from '@/lib/middleware';
 
 const statsHandler = async (req, res) => {
@@ -15,13 +15,15 @@ const statsHandler = async (req, res) => {
         const { userId } = req.user; // Assumes authMiddleware attaches user info to req
 
         const productsListed = await Product.countDocuments({ userId, isListed: true });
-        // const salesMade = await Order.countDocuments({ userId }); // Adjust this query as needed
-        // const messages = await Message.countDocuments({ userId }); // Adjust this query as needed
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         return res.status(200).json({
             productsListed,
-            // salesMade,
-            // messages,
+            withdrawableAmount: user.withdrawableAmount,
         });
     } catch (error) {
         console.error('Failed to fetch statistics:', error);

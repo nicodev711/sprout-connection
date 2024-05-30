@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 export default function Statistics({ token }) {
     const [statistics, setStatistics] = useState({
         productsListed: 0,
-        salesMade: 0,
+        withdrawableAmount: 0,
         messages: 0,
     });
 
@@ -40,14 +40,12 @@ export default function Statistics({ token }) {
                     <p>{statistics.productsListed}</p>
                 </div>
                 <div>
-                    <h3 className="text-lg font-semibold">Sales Made</h3>
-                    {/*<p>{statistics.salesMade}</p>*/}
-                    <p>5</p>
+                    <h3 className="text-lg font-semibold">Withdrawable Amount</h3>
+                    <p>£{statistics.withdrawableAmount.toFixed(2)}</p>
                 </div>
                 <div>
                     <h3 className="text-lg font-semibold">Messages</h3>
-                    {/*<p>{statistics.messages}</p>*/}
-                    <p>3</p>
+                    <p>{statistics.messages}</p>
                 </div>
             </div>
         </section>

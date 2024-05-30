@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    withdrawableAmount: {
+        type: Number,
+        default: 0.00,
+    },
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
