@@ -27,6 +27,7 @@
     "nextjs-google-analytics": "^2.3.3",
     "react": "^18",
     "react-dom": "^18",
+    "sharp": "^0.33.4",
     "stripe": "^15.8.0"
   },
   "devDependencies": {
