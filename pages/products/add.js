@@ -95,7 +95,6 @@ export default function CreateProduct({ token }) {
                             placeholder="Quantity"
                             value={quantity}
                             onChange={(e) => setQuantity(e.target.value)}
-                            required
                         />
                     </div>
                     <div className="mb-4">
@@ -123,6 +122,22 @@ export default function CreateProduct({ token }) {
                         />
                     </div>
                     <div className="mb-4">
+                        <label className="block text-gray-700 mb-2" htmlFor="category">Category</label>
+                        <select
+                            id="category"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        >
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Honey">Honey</option>
+                            <option value="Plants">Plants</option>
+                            <option value="Seeds">Seeds</option>
+                        </select>
+                    </div>
+                    <div className="mb-4">
                         <label className="block text-gray-700 mb-2" htmlFor="image">Image</label>
                         <input
                             id="image"
@@ -132,7 +147,8 @@ export default function CreateProduct({ token }) {
                         />
                     </div>
                     <div className="mb-4" hidden>
-                        <label className="block text-gray-700 mb-2" htmlFor="imageCDNLink">Image CDN Link (Optional)</label>
+                        <label className="block text-gray-700 mb-2" htmlFor="imageCDNLink">Image CDN Link
+                            (Optional)</label>
                         <input
                             id="imageCDNLink"
                             type="text"
@@ -142,7 +158,8 @@ export default function CreateProduct({ token }) {
                             onChange={(e) => setImageCDNLink(e.target.value)}
                         />
                     </div>
-                    <button type="submit" className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
+                    <button type="submit"
+                            className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
                         Create Product
                     </button>
                 </form>

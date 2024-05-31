@@ -8,7 +8,7 @@ const indexHandler = async (req, res) => {
     if (req.method === 'POST') {
         const { title, description, quantity, units, price, category, imageCDNLink } = req.body;
 
-        if (!title || !description || !quantity || !units || !price || !category) {
+        if (!title || !description || !units || !price || !category) {
             return res.status(400).json({ error: 'All fields except imageCDNLink are required' });
         }
 

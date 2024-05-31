@@ -1,6 +1,13 @@
 import connectToDatabase from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { authMiddleware } from '@/lib/middleware';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const idHandler = async (req, res) => {
     await connectToDatabase();
@@ -33,6 +40,17 @@ const idHandler = async (req, res) => {
                 }
             } else if (req.method === 'DELETE') {
                 try {
+                    const product = await Product.findById(id);
+                    if (!product) {
+                        return res.status(404).json({ error: 'Product not found' });
+                    }
+
+                    // Delete image from Cloudinary
+                    if (product.imageCDNLink) {
+                        const publicId = `sproutConnection/${product.imageCDNLink.split('/').pop().split('.')[0]}`;
+                        await cloudinary.uploader.destroy(publicId);
+                    }
+
                     await Product.findByIdAndDelete(id);
                     res.status(204).end();
                 } catch (error) {

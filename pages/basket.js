@@ -20,7 +20,7 @@ const Basket = () => {
         if (!basket || !Array.isArray(basket)) return 0;
         return basket.reduce((total, item) => {
             const price = parseFloat(item.price || 0);
-            const quantity = parseInt(item.quantity, 10);
+            const quantity = parseFloat(item.quantity);
             if (isNaN(price) || isNaN(quantity)) {
                 console.warn('Invalid price or quantity:', { price, quantity });
                 return total;
@@ -31,7 +31,7 @@ const Basket = () => {
 
     const handleQuantityChange = (index, quantity) => {
         const productId = basket[index].productId;
-        updateItemQuantity(productId, quantity);
+        updateItemQuantity(productId, parseFloat(quantity));
     };
 
     const handleRemoveItem = (index) => {
@@ -70,13 +70,14 @@ const Basket = () => {
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
             <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Basket</h1>
-                {totalAmount < 5 && (
+                {totalAmount > 0 && totalAmount < 5 && (
                     <div className="toast mb-4">
                         <div className="alert alert-info">
                             <span>Your basket total is below £5. Add more items to avoid an extra £0.30 fee.</span>
                         </div>
                     </div>
                 )}
+
                 <ul className="space-y-4">
                     {basket.length > 0 ? (
                         basket.map((item, index) => (
@@ -88,20 +89,24 @@ const Basket = () => {
                                         <label htmlFor={`quantity-${index}`} className="mr-2">Quantity:</label>
                                         <input
                                             type="number"
+                                            step="0.1"
                                             id={`quantity-${index}`}
                                             value={item.quantity}
-                                            onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
+                                            onChange={(e) => handleQuantityChange(index, e.target.value)}
                                             min="1"
                                             className="w-16 p-1 border rounded"
                                         />
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => handleRemoveItem(index)}
-                                    className="ml-4 text-red-500 hover:underline"
-                                >
-                                    Remove
-                                </button>
+                                <div className="flex flex-col items-end">
+                                    <p className="text-sm font-semibold">Total: £{(item.price * item.quantity).toFixed(2)}</p>
+                                    <button
+                                        onClick={() => handleRemoveItem(index)}
+                                        className="ml-4 text-red-500 hover:underline mt-2"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
                             </li>
                         ))
                     ) : (

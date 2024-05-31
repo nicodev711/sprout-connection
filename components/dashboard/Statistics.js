@@ -40,7 +40,7 @@ export default function Statistics({ token }) {
                     <p>{statistics.productsListed}</p>
                 </div>
                 <div>
-                    <h3 className="text-lg font-semibold">Withdrawable Amount</h3>
+                    <h3 className="text-lg font-semibold">Sales Total</h3>
                     <p>£{statistics.withdrawableAmount.toFixed(2)}</p>
                 </div>
                 <div>
