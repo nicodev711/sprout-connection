@@ -4,13 +4,13 @@ import {UserProvider} from "@/contexts/UserContext";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from "@/components/Footer";
 import Head from 'next/head'
-import {GoogleAnalytics} from "nextjs-google-analytics";
+import {GoogleAnalytics} from '@next/third-parties/google'
 
 export default function MyApp({ Component, pageProps }) {
     return (
         <>
         <Head>
-            <GoogleAnalytics trackPageViews />
+            <GoogleAnalytics gaId="G-QCFYDDKPC2" />
             <title>Sprout Connection</title>
         </Head>
         <UserProvider>
