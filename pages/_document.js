@@ -7,6 +7,6 @@ export default function Document() {
         <Main/>
         <NextScript/>
         </body>
-        <GoogleTagManager gtmId="GTM-M725PM8F" />
+        <GoogleTagManager gtmId="G-QCFYDDKPC2" />
     </Html>;
 }
