@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import axios from 'axios';
 import dynamic from 'next/dynamic';
@@ -13,6 +13,23 @@ export default function QuickActions({ user }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alert, setAlert] = useState(false);
+    const [accountStatus, setAccountStatus] = useState('checking');
+
+    useEffect(() => {
+        const checkAccountStatus = async () => {
+            try {
+                const response = await axios.get('/api/stripe/check-account-status');
+                setAccountStatus(response.data.accountStatus);
+            } catch (error) {
+                console.error('Failed to check account status:', error);
+                setAccountStatus('error');
+            }
+        };
+
+        if (user.stripeAccountId) {
+            checkAccountStatus();
+        }
+    }, [user.stripeAccountId]);
 
     const handleAlert = () => {
         setAlert(true);
@@ -62,16 +79,25 @@ export default function QuickActions({ user }) {
         }
     };
 
-    const handleWithdrawFunds = async () => {
+    const handleCompleteStripeSetup = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await axios.post('/api/withdraw-funds');
-            alert('Withdrawal initiated successfully');
+            const deleteResponse = await axios.post('/api/stripe/delete-stripe-account-id');
+            if (deleteResponse.status === 200) {
+                const response = await axios.post('/api/stripe/create-stripe-account');
+                if (response.data.url) {
+                    window.location.href = response.data.url; // Redirect to Stripe account onboarding
+                } else {
+                    setError('Failed to complete Stripe setup');
+                }
+            } else {
+                setError('Failed to delete existing Stripe account ID');
+            }
         } catch (error) {
-            console.error('Failed to withdraw funds:', error);
-            setError('Failed to withdraw funds');
+            console.error('Failed to complete Stripe setup:', error);
+            setError('Failed to complete Stripe setup');
         } finally {
             setLoading(false);
         }
@@ -92,34 +118,50 @@ export default function QuickActions({ user }) {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {user.stripeAccountId ? (
-                    <Link href={"/products/add"} className={`btn btn-accent`}>
+                    accountStatus === 'complete' ? (
+                        <Link href={"/products/add"} className={`btn btn-accent`}>
+                            Add New Product
+                        </Link>
+                    ) : accountStatus === 'incomplete' || accountStatus === 'checking' ? (
+                        <Link href={"/products/add"} className={`btn btn-accent disabled`} disabled>
+                            Add New Product
+                        </Link>
+                    ) : (
+                        <Link href={"/products/add"} className={`btn btn-accent disabled`} disabled>
+                            Add New Product
+                        </Link>
+                    )
+                ) : (
+                    <Link href={"/products/add"} className={`btn btn-accent disabled`} disabled>
                         Add New Product
                     </Link>
-                ) : (
-                    <button onClick={handleAlert} className="btn btn-accent">
-                        Add New Product
-                    </button>
                 )}
                 <Link href={"/products/manage"} className="btn btn-accent">Manage Products</Link>
                 {user.stripeAccountId ? (
-                    <button
-                        className="btn btn-accent"
-                        onClick={handleWithdrawFunds}
-                        disabled={loading}
-                    >
-                        {loading ? 'Withdrawing...' : 'Withdraw Funds'}
-                    </button>
+                    accountStatus === 'complete' ? (
+                        <Link href={"/products/add"} className={`btn btn-accent hidden`}>
+                            Add New Product
+                        </Link>
+                    ) : accountStatus === 'incomplete' || accountStatus === 'checking' ? (
+                        <button
+                            onClick={handleCompleteStripeSetup}
+                            className="btn btn-accent"
+                            disabled={accountStatus === 'checking'}
+                        >
+                            {accountStatus === 'checking' ? 'Checking account status...' : 'Complete Stripe Setup'}
+                        </button>
+                    ) : (
+                        <Link href={"/products/add"} className={`btn btn-accent disabled hidden`} disabled>
+                            Add 2New Product
+                        </Link>
+                    )
                 ) : (
-                    <button
-                        className="btn btn-accent"
-                        onClick={handleCreateStripeAccount}
-                        disabled={loading}
-                    >
-                        {loading ? 'Creating Account...' : 'Create Stripe Account'}
+                    <button onClick={handleCreateStripeAccount} className="btn btn-accent">
+                        Create Stripe Account
                     </button>
                 )}
-                <button className="btn btn-accent" disabled>View Messages</button>
-                <button className="btn btn-accent" disabled>Manage Settings</button>
+                <button className="btn btn-accent hidden" disabled>View Messages</button>
+                <button className="btn btn-accent hidden" disabled>Manage Settings</button>
             </div>
             {error && <p className="text-red-500">{error}</p>}
             {user.isAdmin && (
