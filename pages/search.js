@@ -3,7 +3,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SearchBar from '@/components/SearchBar';
 import Link from "next/link";
-import Image from "next/image"
+import Image from "next/image";
+
+const truncateText = (text, maxLength) => {
+    if (text.length > maxLength) {
+        return text.slice(0, maxLength) + '...';
+    }
+    return text;
+};
 
 const SearchPage = () => {
     const router = useRouter();
@@ -29,17 +36,24 @@ const SearchPage = () => {
                 <h2 className="text-xl font-bold mb-4">Search</h2>
                 <SearchBar initialQuery={query} initialCategory={category} initialPostcode={postcode} initialRange={range} />
             </aside>
-            <div className="w-full lg:w-3/4 p-4 ">
+            <div className="w-full lg:w-3/4 p-4">
                 <h3 className="text-lg font-bold mb-2 text-center">Search Results</h3>
                 {results.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex flex-wrap justify-center">
                         {results.map((result) => (
                             <Link key={result._id} href={`/products/${result._id}`}>
-                                <div key={result.id} className="card card-compact w-96 bg-base-100 shadow-xl">
-                                    <figure><Image src={result.imageCDNLink} alt={result.title} width="500" height="500"/></figure>
+                                <div className="card card-compact w-64 bg-base-100 shadow-xl m-4">
+                                    <figure className="relative h-48 w-full overflow-hidden rounded-lg">
+                                        <Image
+                                            src={result.imageCDNLink}
+                                            alt={result.title}
+                                            layout="fill"
+                                            objectFit="cover"
+                                        />
+                                    </figure>
                                     <div className="card-body">
                                         <h2 className="card-title">{result.title}</h2>
-                                        <p>{result.description}</p>
+                                        <p>{truncateText(result.description, 30)}</p>
                                         <p className="text-lg font-semibold">£{result.price}</p>
                                         <div className="card-actions justify-end">
                                             <button className="btn btn-primary">Buy Now</button>
@@ -50,7 +64,7 @@ const SearchPage = () => {
                         ))}
                     </div>
                 ) : (
-                    <p>No results found.</p>
+                    <p className="text-center">No results found.</p>
                 )}
             </div>
         </div>

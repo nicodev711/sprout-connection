@@ -16,11 +16,13 @@ export default function EditProduct() {
     const [image, setImage] = useState(null);
     const [imageCDNLink, setImageCDNLink] = useState('');
     const [token, setToken] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleImageUpload = async (file) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = async () => {
+            setLoading(true);
             const response = await fetch('/api/products/upload', {
                 method: 'POST',
                 headers: {
@@ -35,6 +37,7 @@ export default function EditProduct() {
             } else {
                 alert('Failed to upload image.');
             }
+            setLoading(false);
         };
     };
 
@@ -74,23 +77,28 @@ export default function EditProduct() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        const response = await fetch(`/api/products/${id}`, {
-            method: 'PUT', // Changed to 'PUT' for updating the product
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink, isListed, isDelivered }),
-        });
+        // Simulate a delay for CDN creation
+        setTimeout(async () => {
+            const response = await fetch(`/api/products/${id}`, {
+                method: 'PUT', // Changed to 'PUT' for updating the product
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink, isListed, isDelivered }),
+            });
 
-        if (response.ok) {
-            alert('Product updated successfully!');
-            router.push('/products/manage');
-        } else {
-            const errorData = await response.json();
-            alert(`Failed to update product: ${errorData.error || 'Unknown error'}`);
-        }
+            if (response.ok) {
+                alert('Product updated successfully!');
+                router.push('/products/manage');
+            } else {
+                const errorData = await response.json();
+                alert(`Failed to update product: ${errorData.error || 'Unknown error'}`);
+            }
+            setLoading(false);
+        }, 2000);
     };
 
     return (
@@ -225,7 +233,7 @@ export default function EditProduct() {
                     />
                 </div>
                 <button type="submit" className="btn btn-accent mt-2">
-                    Save Changes
+                    {loading ? <span className="loading loading-spinner loading-md"></span> : 'Save Changes'}
                 </button>
             </form>
         </section>

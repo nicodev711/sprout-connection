@@ -9,6 +9,7 @@ export default function CreateProduct({ token }) {
     const [category, setCategory] = useState('Vegetables');
     const [image, setImage] = useState(null);
     const [imageCDNLink, setImageCDNLink] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleImageUpload = async (file) => {
         const reader = new FileReader();
@@ -33,29 +34,35 @@ export default function CreateProduct({ token }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink }),
-        });
+        // Simulate a delay for CDN creation
+        setTimeout(async () => {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink }),
+            });
 
-        if (response.ok) {
-            setTitle('');
-            setDescription('');
-            setQuantity('');
-            setUnits('');
-            setPrice('');
-            setImage(null);
-            setImageCDNLink('');
-            alert('Product created successfully!');
-        } else {
-            const errorData = await response.json();
-            alert(`Failed to create product: ${errorData.error || 'Unknown error'}`);
-        }
+            if (response.ok) {
+                setTitle('');
+                setDescription('');
+                setQuantity('');
+                setUnits('');
+                setPrice('');
+                setImage(null);
+                setImageCDNLink('');
+                alert('Product created successfully!');
+            } else {
+                const errorData = await response.json();
+                alert(`Failed to create product: ${errorData.error || 'Unknown error'}`);
+            }
+
+            setLoading(false);
+        }, 2000);
     };
 
     return (
@@ -160,7 +167,7 @@ export default function CreateProduct({ token }) {
                     </div>
                     <button type="submit"
                             className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
-                        Create Product
+                        {loading ? <span className="loading loading-spinner loading-md"></span> : 'Create Product'}
                     </button>
                 </form>
             </div>

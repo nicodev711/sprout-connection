@@ -49,8 +49,12 @@ export default function ProductDetails() {
                 <div className="lg:w-1/2 bg-white p-6 rounded-lg shadow-lg">
                     <h1 className="text-4xl font-bold mb-6">{product.title}</h1>
                     <p className="text-2xl font-semibold text-green-600 mb-4">£{product.price} per {product.units}</p>
-                    <p className="text-gray-700 mb-6">{product.description}</p>
-                    <p className="text-gray-700 mb-4">Available Quantity: {product.quantity} {product.units}</p>
+                    <p className="text-gray-700 mb-6 break-words">{product.description}</p>
+                    {product.quantity ? (
+                        <p className="text-gray-700 mb-4">Available Quantity: {product.quantity} {product.units}</p>
+                    ) : (
+                        <p className="text-gray-700 mb-4">No Quantity Available</p>
+                    )}
                     <div className="mb-6">
                         <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
                             Quantity
