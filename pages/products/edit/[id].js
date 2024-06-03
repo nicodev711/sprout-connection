@@ -10,9 +10,33 @@ export default function EditProduct() {
     const [quantity, setQuantity] = useState(0);
     const [units, setUnits] = useState('');
     const [price, setPrice] = useState(0);
+    const [category, setCategory] = useState('Vegetables');
     const [isListed, setIsListed] = useState(true);
     const [isDelivered, setIsDelivered] = useState(false);
+    const [image, setImage] = useState(null);
     const [imageCDNLink, setImageCDNLink] = useState('');
+    const [token, setToken] = useState('');
+
+    const handleImageUpload = async (file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = async () => {
+            const response = await fetch('/api/products/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: reader.result }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setImageCDNLink(data.url);
+            } else {
+                alert('Failed to upload image.');
+            }
+        };
+    };
 
     useEffect(() => {
         if (id) {
@@ -25,6 +49,7 @@ export default function EditProduct() {
                     setQuantity(product.quantity);
                     setUnits(product.units);
                     setPrice(product.price);
+                    setCategory(product.category);
                     setIsListed(product.isListed);
                     setIsDelivered(product.isDelivered);
                     setImageCDNLink(product.imageCDNLink);
@@ -37,23 +62,34 @@ export default function EditProduct() {
         }
     }, [id]);
 
+    useEffect(() => {
+        const getToken = async () => {
+            const response = await fetch('/api/auth/token');
+            const data = await response.json();
+            setToken(data.token);
+        };
+
+        getToken();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            await axios.put(`/api/products/${id}`, {
-                title,
-                description,
-                quantity,
-                units,
-                price,
-                isListed,
-                isDelivered,
-                imageCDNLink,
-            });
+        const response = await fetch(`/api/products/${id}`, {
+            method: 'PUT', // Changed to 'PUT' for updating the product
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink, isListed, isDelivered }),
+        });
+
+        if (response.ok) {
+            alert('Product updated successfully!');
             router.push('/products/manage');
-        } catch (error) {
-            console.error('Failed to update product:', error);
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to update product: ${errorData.error || 'Unknown error'}`);
         }
     };
 
@@ -95,7 +131,7 @@ export default function EditProduct() {
                         id="quantity"
                         className="input input-bordered w-full"
                         value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
+                        onChange={(e) => setQuantity(parseInt(e.target.value))}
                         required
                     />
                 </div>
@@ -121,9 +157,27 @@ export default function EditProduct() {
                         id="price"
                         className="input input-bordered w-full"
                         value={price}
-                        onChange={(e) => setPrice(e.target.value)}
+                        onChange={(e) => setPrice(parseFloat(e.target.value))}
                         required
                     />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="category">
+                        Category
+                    </label>
+                    <select
+                        id="category"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        required
+                    >
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Honey">Honey</option>
+                        <option value="Plants">Plants</option>
+                        <option value="Seeds">Seeds</option>
+                    </select>
                 </div>
                 <div className="mb-4 flex items-center">
                     <input
@@ -150,13 +204,22 @@ export default function EditProduct() {
                     </label>
                 </div>
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="imageCDNLink">
-                        Image CDN Link
-                    </label>
+                    <label className="block text-gray-700 mb-2" htmlFor="image">Image</label>
                     <input
-                        type="text"
+                        id="image"
+                        type="file"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onChange={(e) => handleImageUpload(e.target.files[0])}
+                    />
+                </div>
+                <div className="mb-4" hidden>
+                    <label className="block text-gray-700 mb-2" htmlFor="imageCDNLink">Image CDN Link
+                        (Optional)</label>
+                    <input
                         id="imageCDNLink"
-                        className="input input-bordered w-full"
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Image CDN Link"
                         value={imageCDNLink}
                         onChange={(e) => setImageCDNLink(e.target.value)}
                     />
