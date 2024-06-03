@@ -6,16 +6,16 @@ export default function PrivacyPolicy() {
     return (
         <div className="container mx-auto p-4">
             <Head>
-                <title>Privacy Policy | Sprout Connections</title>
+                <title>Privacy Policy</title>
             </Head>
             <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
-            <p>Last updated: [Date]</p>
+            <p>Last updated: 3/06/2024</p>
 
             <h2 className="text-2xl font-bold mt-6">1. Introduction</h2>
             <p>
-                Sprout Connections ("we", "our", "us") is committed to protecting and respecting your privacy.
+                Sprout Connections (&#34;we&#34;, &#34;our&#34;, &#34;us&#34;) is committed to protecting and respecting your privacy.
                 This Privacy Policy explains how we collect, use, and share information about you when you visit our website
-                www.sproutconnections.com (the "Site"), and use our services.
+                www.sproutconnections.com (the &#34;Site&#34;), and use our services.
             </p>
             <p>
                 By using our Site and services, you agree to the collection and use of information in accordance with this policy.
@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
 
             <h2 className="text-2xl font-bold mt-6">9. Contact Us</h2>
             <p>
-                If you have any questions about this Privacy Policy, please contact us at [Your Contact Information].
+                If you have any questions about this Privacy Policy, please contact us at contact@sproutconnections.com.
             </p>
         </div>
     );
