@@ -27,8 +27,7 @@ export default function MyApp({ Component, pageProps }) {
 
   gtag('config', 'G-QCFYDDKPC2');`}
             </Script>
-            <Script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="8baa8391-6083-493a-9e0a-66fb89829879" data-blockingmode="auto" type="text/javascript"/>
-            <Script id="CookieDeclaration" src="https://consent.cookiebot.com/8baa8391-6083-493a-9e0a-66fb89829879/cd.js" type="text/javascript" async/>
+
         </>
     );
 }
