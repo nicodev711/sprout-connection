@@ -1,73 +1,42 @@
+// pages/search.js
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import SearchBar from '@/components/SearchBar';
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/image"
 
-export default function Search() {
+const SearchPage = () => {
     const router = useRouter();
-    const { query, category } = router.query;
-    const [results, setResults] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [categories, setCategories] = useState('');
+    const { query, category, postcode, range } = router.query;
 
-    const handleSearch = () => {
-        router.push(`/search?query=${searchQuery}&category=${categories}`);
-    };
+    const [results, setResults] = useState([]);
 
     useEffect(() => {
-        if (query || category) {
-            const fetchResults = async () => {
-                try {
-                    const response = await axios.get(`/api/search`, {
-                        params: { query, category }
-                    });
-                    setResults(response.data);
-                } catch (error) {
-                    console.error('Failed to fetch search results:', error);
-                }
-            };
+        const fetchProducts = async () => {
+            const res = await fetch(`/api/search?query=${query}&category=${category}&postcode=${postcode}&range=${range}`);
+            const data = await res.json();
+            setResults(data);
+        };
 
-            fetchResults();
+        if (query || category || postcode || range) {
+            fetchProducts();
         }
-    }, [query, category]);
+    }, [query, category, postcode, range]);
 
     return (
-        <div className="container mx-auto p-4 flex flex-col lg:flex-row">
-            <aside className="w-full lg:w-1/4 bg-gray-100 p-4 rounded-lg shadow-md mb-4 lg:hidden">
+        <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
+            <aside className="w-full bg-gray-100 p-4 rounded-lg shadow-md mb-4 lg:hidden">
                 <h2 className="text-xl font-bold mb-4">Search</h2>
-                <div className="flex flex-col space-y-2">
-                    <input
-                        className="input input-bordered"
-                        placeholder="Search"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <select
-                        className="select select-bordered"
-                        value={categories}
-                        onChange={(e) => setCategories(e.target.value)}
-                    >
-                        <option value="" disabled>Filter by Category</option>
-                        <option>Vegetables</option>
-                        <option>Fruits</option>
-                        <option>Honey</option>
-                        <option>Plants</option>
-                        <option>Seeds</option>
-                    </select>
-                    <button className="btn btn-primary mt-2" onClick={handleSearch}>Search</button>
-                </div>
+                <SearchBar initialQuery={query} initialCategory={category} initialPostcode={postcode} initialRange={range} />
             </aside>
-            <main className="w-full lg:w-3/4">
-                <h1 className="text-2xl font-bold mb-4">Search Results</h1>
+            <div className="w-full lg:w-3/4 p-4 ">
+                <h3 className="text-lg font-bold mb-2 text-center">Search Results</h3>
                 {results.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {results.map((result) => (
                             <Link key={result._id} href={`/products/${result._id}`}>
-                                <div key={result.id} className="card card-compact w-full bg-base-100 shadow-xl">
-                                    <figure>
-                                        <Image src={result.imageCDNLink} alt={result.title} width="500" height="500" className="w-full h-auto"/>
-                                    </figure>
+                                <div key={result.id} className="card card-compact w-96 bg-base-100 shadow-xl">
+                                    <figure><Image src={result.imageCDNLink} alt={result.title} width="500" height="500"/></figure>
                                     <div className="card-body">
                                         <h2 className="card-title">{result.title}</h2>
                                         <p>{result.description}</p>
@@ -83,7 +52,9 @@ export default function Search() {
                 ) : (
                     <p>No results found.</p>
                 )}
-            </main>
+            </div>
         </div>
     );
-}
+};
+
+export default SearchPage;
