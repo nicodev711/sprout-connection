@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import Link from "next/link";
 import axios from 'axios';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function QuickActions({ user }) {
     const [title, setTitle] = useState('');
@@ -167,13 +171,13 @@ export default function QuickActions({ user }) {
                                         <label className="block text-sm font-medium text-gray-700" htmlFor="content">
                                             Content
                                         </label>
-                                        <textarea
+                                        <ReactQuill
                                             id="content"
-                                            className="textarea textarea-bordered w-full"
                                             value={content}
-                                            onChange={(e) => setContent(e.target.value)}
+                                            onChange={setContent}
+                                            className="h-40"
                                             required
-                                        ></textarea>
+                                        />
                                     </div>
                                 </div>
                                 <button type="submit" className="btn btn-accent mt-2">

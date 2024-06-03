@@ -32,8 +32,8 @@ const RenderGardenerDashboard = () => {
             <ul>
                 {recentOrders.length > 0 ? (
                     recentOrders.map(order => (
-                        <li key={order._id}>
-                            Order #{order._id.slice(-4)} - {order.products.map(p => p.productId.title).join(', ')} - {order.status}
+                        <li key={order._id} className="mb-2">
+                            Order #{order._id.slice(-4)} - {order.products.map(p => `${p.productId.title} (${p.quantity}${p.productId.units})`).join(', ')} - {order.status}
                         </li>
                     ))
                 ) : (
