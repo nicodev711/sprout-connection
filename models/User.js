@@ -49,6 +49,15 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: false
     },
+    postcode: {
+        type: String
+    },
+    latitude: {
+        type: Number
+    },
+    longitude: {
+        type: Number
+    }
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -1,5 +1,6 @@
 import connectToDatabase from '@/lib/mongoose';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import { authMiddleware } from '@/lib/middleware';
 
 const indexHandler = async (req, res) => {
@@ -13,6 +14,12 @@ const indexHandler = async (req, res) => {
         }
 
         try {
+            // Fetch the authenticated user's details
+            const user = await User.findById(req.user.userId);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
             const newProduct = new Product({
                 title,
                 description,
@@ -24,7 +31,11 @@ const indexHandler = async (req, res) => {
                 imageCDNLink: imageCDNLink || '', // Ensure this can be empty or null
                 isListed: true,
                 isDelivered: false,
+                postcode: user.postcode,       // Attach user's postcode
+                latitude: user.latitude,       // Attach user's latitude
+                longitude: user.longitude      // Attach user's longitude
             });
+
             await newProduct.save();
             return res.status(201).json(newProduct);
         } catch (error) {

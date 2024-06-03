@@ -50,6 +50,15 @@ const ProductSchema = new mongoose.Schema({
     imageCDNLink: {
         type: String,
     },
+    postcode: {
+        type: String,
+    },
+    latitude: {
+        type: Number,
+    },
+    longitude: {
+        type: Number,
+    }
 });
 
 ProductSchema.pre('save', function (next) {

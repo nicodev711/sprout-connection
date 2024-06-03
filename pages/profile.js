@@ -10,6 +10,7 @@ export default function Profile() {
     const [isGardener, setIsGardener] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [postcode, setPostcode] = useState('');
     const router = useRouter();
 
     useEffect(() => {
@@ -22,6 +23,7 @@ export default function Profile() {
                 setFirstName(data.user.firstName);
                 setLastName(data.user.lastName);
                 setEmail(data.user.email);
+                setPostcode(data.user.postcode)
                 setIsGardener(data.user.isGardener);
             } else {
                 router.push('/login');
@@ -39,7 +41,7 @@ export default function Profile() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, firstName, lastName, email, isGardener }),
+            body: JSON.stringify({ username, firstName, lastName, email, isGardener, postcode }),
         });
 
         if (res.ok) {
@@ -103,6 +105,16 @@ export default function Profile() {
                             required
                         />
                     </div>
+                    <div className="mb-4">
+                        <label htmlFor="postcode" className="block text-gray-700 mb-2">Postcode</label>
+                        <input
+                            id="postcode"
+                            type="text"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={postcode}
+                            onChange={(e) => setPostcode(e.target.value)}
+                        />
+                    </div>
                     <div className="mb-4 flex items-center">
                         <input
                             id="isGardener"
@@ -115,7 +127,8 @@ export default function Profile() {
                     </div>
                     {error && <p className="text-red-500 mb-4">{error}</p>}
                     {success && <p className="text-green-500 mb-4">{success}</p>}
-                    <button type="submit" className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
+                    <button type="submit"
+                            className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
                         Update Profile
                     </button>
                 </form>

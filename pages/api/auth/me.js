@@ -1,4 +1,3 @@
-// pages/api/auth/me.js
 import { verifyToken } from '@/lib/jwt';
 import connectToDatabase from '@/lib/mongoose';
 import User from '@/models/User';
@@ -8,7 +7,6 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-
 
     const { token } = cookie.parse(req.headers.cookie || '');
     if (!token) {
@@ -24,6 +22,7 @@ export default async function handler(req, res) {
         }
         res.status(200).json({ user });
     } catch (error) {
+        console.error('Error fetching user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
