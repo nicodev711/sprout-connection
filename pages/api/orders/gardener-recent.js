@@ -11,7 +11,7 @@ const gardenerRecentOrdersHandler = async (req, res) => {
         const recentOrders = await Order.find({ gardenerIds: userId })
             .sort({ createdAt: -1 })
             .limit(10)
-            .populate('products.productId', 'title');
+            .populate('products.productId', 'title units');
 
         res.status(200).json(recentOrders);
     } catch (error) {

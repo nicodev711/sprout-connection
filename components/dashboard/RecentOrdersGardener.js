@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useUser } from '@/contexts/UserContext';
+import Link from 'next/link';
 
 const RenderGardenerDashboard = () => {
     const { user } = useUser();
@@ -33,9 +34,11 @@ const RenderGardenerDashboard = () => {
                 {recentOrders.length > 0 ? (
                     recentOrders.map(order => (
                         <li key={order._id} className="mb-2">
-                            Order #{order._id.slice(-4)} - {order.products.map(p => (
-                            `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ''})`
-                        )).join(', ')} - {order.status}
+                            <Link href={`/orders/${order._id}`} className="text-blue-500 hover:underline">
+                                Order #{order._id.slice(-4)} - {order.products.map(p => (
+                                `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ' units'})`
+                            )).join(', ')} - {order.status}
+                            </Link>
                         </li>
                     ))
                 ) : (
