@@ -31,7 +31,8 @@ export default function MyApp({ Component, pageProps }) {
                 data-cbid="8baa8391-6083-493a-9e0a-66fb89829879"
                 data-blockingmode="auto"
                 type="text/javascript"
-            ></Script>
+                strategy="afterInteractive"
+            />
         </>
     );
 }
