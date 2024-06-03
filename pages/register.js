@@ -8,18 +8,28 @@ export default function Register() {
     const [username, setUsername] = useState('');
     const [isGardener, setIsGardener] = useState(false);
     const [password, setPassword] = useState('');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [acceptedPrivacyPolicy, setAcceptedPrivacyPolicy] = useState(false);
     const [error, setError] = useState(null);
     const router = useRouter();
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!acceptedTerms || !acceptedPrivacyPolicy) {
+            setError('You must accept the terms and privacy policy');
+            return;
+        }
 
         try {
             const res = await axios.post('/api/auth/register', {
                 username,
                 email,
                 password,
-                isGardener
+                isGardener,
+                acceptedTerms,
+                acceptedPrivacyPolicy,
             });
 
             if (res.status === 201) {
@@ -80,13 +90,42 @@ export default function Register() {
                         />
                         <label htmlFor="isGardener" className="text-gray-700">Register as Gardener</label>
                     </div>
+                    <div className="mb-4 flex items-center">
+                        <input
+                            id="acceptedTerms"
+                            type="checkbox"
+                            className="mr-2"
+                            checked={acceptedTerms}
+                            onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        />
+                        <label htmlFor="acceptedTerms" className="text-gray-700">I accept the <Link href="/terms"
+                                                                                                    className="text-green-600 hover:underline">Terms
+                            and Conditions</Link></label>
+                    </div>
+                    <div className="mb-4 flex items-center">
+                        <input
+                            id="acceptedPrivacyPolicy"
+                            type="checkbox"
+                            className="mr-2"
+                            checked={acceptedPrivacyPolicy}
+                            onChange={(e) => setAcceptedPrivacyPolicy(e.target.checked)}
+                        />
+                        <label htmlFor="acceptedPrivacyPolicy" className="text-gray-700">I accept the <Link
+                            href="/privacy" className="text-green-600 hover:underline">Privacy Policy</Link></label>
+                    </div>
                     {error && <p className="text-red-500 mb-4">{error}</p>}
                     <button type="submit"
-                            className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
+                            className={`w-full py-2 px-4 text-white font-bold rounded-lg transition duration-300 ${
+                                acceptedTerms && acceptedPrivacyPolicy ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed"
+                            }`}
+                            disabled={!acceptedTerms || !acceptedPrivacyPolicy}
+                            title={!acceptedTerms || !acceptedPrivacyPolicy ? "You must accept the terms and privacy policy to register." : "Click to register"}>
                         Register
                     </button>
                 </form>
-                <p className="mt-4 text-center">Already having an account? <Link href="/login" className="text-green-600 hover:underline">Login</Link></p>
+                <p className="mt-4 text-center">Already having an account? <Link href="/login"
+                                                                                 className="text-green-600 hover:underline">Login</Link>
+                </p>
             </div>
         </div>
     );

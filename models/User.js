@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
@@ -39,6 +38,16 @@ const UserSchema = new mongoose.Schema({
     totalEarnings: {
         type: Number,
         default: 0,
+    },
+    acceptedTerms: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    acceptedPrivacyPolicy: {
+        type: Boolean,
+        required: true,
+        default: false
     },
 });
 

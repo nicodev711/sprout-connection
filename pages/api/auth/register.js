@@ -10,10 +10,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    const { username, email, password, isGardener } = req.body;
+    const { username, email, password, isGardener, acceptedTerms, acceptedPrivacyPolicy } = req.body;
 
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: 'Username, email, and password are required' });
+    if (!username || !email || !password || !acceptedTerms || !acceptedPrivacyPolicy) {
+        return res.status(400).json({ error: 'Username, email, password, postcode, and acceptance of terms and privacy policy are required' });
     }
 
     try {
@@ -27,7 +27,14 @@ export default async function handler(req, res) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({ username, email, password: hashedPassword, isGardener });
+        const user = await User.create({
+            username,
+            email,
+            password: hashedPassword,
+            isGardener,
+            acceptedTerms,
+            acceptedPrivacyPolicy  // Include this in the user creation
+        });
 
         const token = await signToken({ userId: user._id });
 
@@ -38,7 +45,7 @@ export default async function handler(req, res) {
             sameSite: 'strict',
             path: '/'
         }));
-        res.status(201).json({ message: 'User created', userId: user._id });
+        res.status(201).json({ message: 'User created successfully', userId: user._id });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
