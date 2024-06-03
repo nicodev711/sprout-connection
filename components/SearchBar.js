@@ -27,11 +27,11 @@ const SearchBar = ({ initialQuery = '', initialCategory = '', initialPostcode = 
                 onChange={(e) => setCategory(e.target.value)}
             >
                 <option value="" disabled selected>Filter</option>
-                <option>Vegetables</option>
-                <option>Fruits</option>
-                <option>Honey</option>
-                <option>Plants</option>
-                <option>Seeds</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Fruits">Fruits</option>
+                <option value="Honey">Honey</option>
+                <option value="Plants">Plants</option>
+                <option value="Seeds">Seeds</option>
             </select>
             <input
                 className="input input-bordered flex-grow lg:join-item"

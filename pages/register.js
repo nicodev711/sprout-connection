@@ -98,7 +98,7 @@ export default function Register() {
                             checked={acceptedTerms}
                             onChange={(e) => setAcceptedTerms(e.target.checked)}
                         />
-                        <label htmlFor="acceptedTerms" className="text-gray-700">I accept the <Link href="/terms"
+                        <label htmlFor="acceptedTerms" className="text-gray-700">I accept the <Link href="/terms-and-conditions"
                                                                                                     className="text-green-600 hover:underline">Terms
                             and Conditions</Link></label>
                     </div>
@@ -111,7 +111,7 @@ export default function Register() {
                             onChange={(e) => setAcceptedPrivacyPolicy(e.target.checked)}
                         />
                         <label htmlFor="acceptedPrivacyPolicy" className="text-gray-700">I accept the <Link
-                            href="/privacy" className="text-green-600 hover:underline">Privacy Policy</Link></label>
+                            href="/privacy-policy" className="text-green-600 hover:underline">Privacy Policy</Link></label>
                     </div>
                     {error && <p className="text-red-500 mb-4">{error}</p>}
                     <button type="submit"
