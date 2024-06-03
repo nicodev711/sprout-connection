@@ -8,6 +8,9 @@ export default function Footer() {
                 <Link href="/terms-and-conditions" className="link link-hover mx-2 text-white">
                    Terms and Conditions
                 </Link>
+                <Link href="/privacy-policy" className="link link-hover mx-2 text-white">
+                    Privacy Policy
+                </Link>
                 <a href="#" className="link link-hover mx-2">About Us</a>
                 <a href="#" className="link link-hover mx-2">Contact</a>
                 <a href="#" className="link link-hover mx-2">FAQs</a>
