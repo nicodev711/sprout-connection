@@ -65,7 +65,7 @@ export default function QuickActions({ user }) {
         setError(null);
 
         try {
-            const response = await axios.post('/api/create-stripe-account');
+            const response = await axios.post('/api/stripe/create-stripe-account');
             if (response.data.url) {
                 window.location.href = response.data.url; // Redirect to Stripe account onboarding
             } else {
