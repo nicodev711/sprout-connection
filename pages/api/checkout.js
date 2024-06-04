@@ -37,10 +37,12 @@ const checkoutHandler = async (req, res) => {
             },
             quantity: item.quantity,
         }));
-
+        const fees = process.env.PLATEFORM_FEES
+        const smallFees = process.env.SMALL_PLATEFORM_FEE
+        const minOrder = process.env.MIN_ORDER
         const totalProductAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
-        const serviceFee = (totalProductAmount * 0.1).toFixed(2);
-        const smallOrderFee = totalProductAmount < 5 ? 0.30 : 0;
+        const serviceFee = (totalProductAmount * fees).toFixed(2);
+        const smallOrderFee = totalProductAmount < minOrder ? smallFees : 0;
         const total = (parseFloat(totalProductAmount) + parseFloat(serviceFee) + parseFloat(smallOrderFee)).toFixed(2);
 
         lineItems.push({
