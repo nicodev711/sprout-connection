@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ReactHtmlParser from 'react-html-parser';
 
 export default function PressRelease() {
     const [pressReleases, setPressReleases] = useState([]);
@@ -42,7 +43,7 @@ export default function PressRelease() {
             </div>
 
             <dialog id="release_modal" className="modal">
-                <div className="modal-box overflow-y-auto max-w-full">
+                <div className="modal-box">
                     <button
                         type="button"
                         className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -53,7 +54,7 @@ export default function PressRelease() {
                     {selectedRelease && (
                         <>
                             <h3 className="font-bold text-lg">{selectedRelease.title}</h3>
-                            <p className="py-4 break-words">{selectedRelease.content}</p>
+                            <div className="py-4">{ReactHtmlParser(selectedRelease.content)}</div>
                         </>
                     )}
                 </div>
