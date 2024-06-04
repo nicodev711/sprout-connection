@@ -100,8 +100,8 @@ const Navbar = () => {
                             </div>
                         </button>
                     </Link>
-                    <div className="tooltip tooltip-left tooltip-primary" data-tip="We are currently working on it. 😊">
-                        <Link href="/login" className="btn" disabled>
+                    <div className="" data-tip="">
+                        <Link href="/login" className="btn">
                             Login
                         </Link>
                     </div>
