@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useUser } from '@/contexts/UserContext';
+import Link from 'next/link';
 
 const RenderBuyerDashboard = () => {
     const { user } = useUser();
@@ -32,8 +33,12 @@ const RenderBuyerDashboard = () => {
             <ul>
                 {recentOrders.length > 0 ? (
                     recentOrders.map(order => (
-                        <li key={order._id}>
-                            Order #{order._id.slice(-4)} - {order.products.map(p => p.productId.title).join(', ')} - £{order.total}
+                        <li key={order._id} className="mb-2">
+                            <Link href={`/orders/${order._id}`} className="text-blue-500 hover:underline">
+                                Order #{order._id.slice(-4)} - {order.products.map(p => (
+                                `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ' units'})`
+                            )).join(', ')} - £{order.total.toFixed(2)}
+                            </Link>
                         </li>
                     ))
                 ) : (

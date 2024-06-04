@@ -11,7 +11,7 @@ const RenderGardenerDashboard = () => {
     useEffect(() => {
         const fetchRecentOrders = async () => {
             try {
-                const response = await axios.get('/api/orders/gardener-recent'); // Ensure this endpoint exists
+                const response = await axios.get('/api/orders/gardener-recent');
                 setRecentOrders(response.data);
             } catch (error) {
                 console.error('Failed to fetch recent orders:', error);
@@ -36,7 +36,7 @@ const RenderGardenerDashboard = () => {
                         <li key={order._id} className="mb-2">
                             <Link href={`/orders/${order._id}`} className="text-blue-500 hover:underline">
                                 Order #{order._id.slice(-4)} - {order.products.map(p => (
-                                `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ' units'})`
+                                p.productId ? `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ' units'})` : 'Product not found'
                             )).join(', ')} - {order.status}
                             </Link>
                         </li>
