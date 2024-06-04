@@ -39,12 +39,9 @@ const Basket = () => {
         removeItemFromBasket(productId);
     };
 
-    const fees = process.env.PLATEFORM_FEES
-    const smallFees = process.env.SMALL_PLATEFORM_FEE
-    const minOrder = process.env.MIN_ORDER
     const totalAmount = calculateTotal();
-    const serviceFee = totalAmount * fees;
-    const smallOrderFee = totalAmount < minOrder ? smallFees : 0;
+    const serviceFee = totalAmount * 0.1;
+    const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
     const finalAmount = totalAmount + serviceFee + smallOrderFee;
 
     const handleCheckout = async () => {
@@ -73,7 +70,7 @@ const Basket = () => {
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
             <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Basket</h1>
-                {totalAmount > 0 && totalAmount < minOrder && (
+                {totalAmount > 0 && totalAmount < 5 && (
                     <div className="toast mb-4">
                         <div className="alert alert-info">
                             <span>Your basket total is below £5. Add more items to avoid an extra £0.30 fee.</span>
