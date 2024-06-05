@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
         res.setHeader('Set-Cookie', cookie.serialize('token', token, {
             httpOnly: true,
-            secure: true, // Should be true in production
+            secure: false, // Should be true in production
             maxAge: 60 * 60 * 24 * 7, // 1 week
             sameSite: 'strict',
             path: '/'
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
                 email,
                 business_type: 'individual',
                 business_profile: {
-                    mcc: '0763',
+                    mcc: '0763', // Merchant Category Code for agricultural products
                     product_description: 'Selling home grown produce',
                     name: `${firstName} ${lastName}`,
                 },
@@ -80,7 +80,6 @@ export default async function handler(req, res) {
                 },
                 capabilities: {
                     transfers: { requested: true },
-                    card_payments: { requested: true },
                 },
                 tos_acceptance: {
                     date: Math.floor(Date.now() / 1000),
