@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Ensure the user making the request is the buyer or one of the gardeners involved in the order
+        // Ensure the user making the request is the buyer or one of the gardener involved in the order
         if (order.buyerId.toString() !== payload.userId && !order.gardenerIds.includes(payload.userId)) {
             return res.status(403).json({ error: 'Forbidden' });
         }

@@ -57,6 +57,9 @@ const UserSchema = new mongoose.Schema({
     },
     longitude: {
         type: Number
+    },
+    termsAcceptedDate: {
+        type: Date,
     }
 });
 
