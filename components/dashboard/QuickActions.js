@@ -1,13 +1,40 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 import Link from "next/link";
 import axios from 'axios';
 
-export default function QuickActions({ user }) {
-    const [stripeAccountStatus, setStripeAccountStatus] = useState(null);
+export default function QuickActions({user}) {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alert, setAlert] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const response = await fetch('/api/press-release', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({title, description, content}),
+        });
+
+        if (response.ok) {
+            setTitle('');
+            setDescription('');
+            setContent('');
+            document.getElementById('my_modal_3').close();
+            setSuccessMessage('Press release added successfully!');
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+        } else {
+            setError('Failed to add press release.');
+        }
+    };
 
     const handleCreateStripeAccount = async () => {
         setLoading(true);
@@ -39,7 +66,8 @@ export default function QuickActions({ user }) {
         <section className="bg-white p-4 rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-2">Quick Actions</h2>
             {alert && (
-                <div role="alert" className="alert alert-warning flex items-center p-2 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg">
+                <div role="alert"
+                     className="alert alert-warning flex items-center p-2 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-4 w-4 mr-2" fill="none"
                          viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -49,7 +77,8 @@ export default function QuickActions({ user }) {
                 </div>
             )}
             {successMessage && (
-                <div role="alert" className="alert alert-success flex items-center p-2 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                <div role="alert"
+                     className="alert alert-success flex items-center p-2 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
                     <span>{successMessage}</span>
                 </div>
             )}
@@ -60,7 +89,7 @@ export default function QuickActions({ user }) {
                     </Link>
                 ) : (
                     <button onClick={handleAlert} className="btn btn-base-100 disabled">
-                    Add New Product
+                        Add New Product
                     </button>
                 )}
                 {user.stripeAccountId ? (
@@ -75,76 +104,79 @@ export default function QuickActions({ user }) {
                     </button>
                 )}
 
-                <button className="btn btn-accent" disabled>View Messages</button>
-                <button className="btn btn-accent" disabled>Manage Settings</button>
+                <button className="btn btn-accent hidden" disabled>View Messages</button>
+                <button className="btn btn-accent hidden" disabled>Manage Settings</button>
+
+                {error && <p className="text-red-500">{error}</p>}
+                {user.isAdmin && (
+                    <>
+                        <button
+                            className="btn btn-accent"
+                            onClick={() => document.getElementById('my_modal_3').showModal()}
+                        >
+                            Add Press Release
+                        </button>
+                        <dialog id="my_modal_3" className="modal">
+                            <div className="modal-box">
+                                <form onSubmit={handleSubmit}>
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                                        onClick={() => document.getElementById('my_modal_3').close()}
+                                    >
+                                        ✕
+                                    </button>
+                                    <h3 className="font-bold text-lg">Add Press Release</h3>
+                                    <div className="py-4">
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700" htmlFor="title">
+                                                Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="title"
+                                                className="input input-bordered w-full"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700"
+                                                   htmlFor="description">
+                                                Description
+                                            </label>
+                                            <textarea
+                                                id="description"
+                                                className="textarea textarea-bordered w-full"
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                required
+                                            ></textarea>
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700"
+                                                   htmlFor="content">
+                                                Content
+                                            </label>
+                                            <textarea
+                                                id="content"
+                                                className="textarea textarea-bordered w-full"
+                                                value={content}
+                                                onChange={(e) => setContent(e.target.value)}
+                                                required
+                                            ></textarea>
+                                        </div>
+                                    </div>
+                                    <button type="submit" className="btn btn-accent mt-2">
+                                        Submit
+                                    </button>
+                                </form>
+                            </div>
+                        </dialog>
+                    </>
+                )}
             </div>
-            {error && <p className="text-red-500">{error}</p>}
-            {user.isAdmin && (
-                <>
-                    <button
-                        className="btn btn-accent"
-                        onClick={() => document.getElementById('my_modal_3').showModal()}
-                    >
-                        Add Press Release
-                    </button>
-                    <dialog id="my_modal_3" className="modal">
-                        <div className="modal-box">
-                            <form onSubmit={handleSubmit}>
-                                <button
-                                    type="button"
-                                    className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                                    onClick={() => document.getElementById('my_modal_3').close()}
-                                >
-                                    ✕
-                                </button>
-                                <h3 className="font-bold text-lg">Add Press Release</h3>
-                                <div className="py-4">
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700" htmlFor="title">
-                                            Title
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="title"
-                                            className="input input-bordered w-full"
-                                            value={title}
-                                            onChange={(e) => setTitle(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700" htmlFor="description">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            id="description"
-                                            className="textarea textarea-bordered w-full"
-                                            value={description}
-                                            onChange={(e) => setDescription(e.target.value)}
-                                            required
-                                        ></textarea>
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700" htmlFor="content">
-                                            Content
-                                        </label>
-                                        <textarea
-                                            id="content"
-                                            className="textarea textarea-bordered w-full"
-                                            value={content}
-                                            onChange={(e) => setContent(e.target.value)}
-                                            required
-                                        ></textarea>
-                                    </div>
-                                </div>
-                                <button type="submit" className="btn btn-accent mt-2">
-                                    Submit
-                                </button>
-                            </form>
-                        </div>
-                    </dialog>
-                </>
-            )}
         </section>
     );
 }
