@@ -1,78 +1,37 @@
-// pages/api/stripe/create-stripe-account.js
-import connectToDatabase from '@/lib/mongoose';
+import Stripe from 'stripe';
+import { authMiddleware } from '@/lib/middleware';
 import User from '@/models/User';
-import { verifyToken } from '@/lib/jwt';
-import cookie from 'cookie';
-import stripe from '@/lib/stripe';
+import dbConnect from '@/lib/mongoose';
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Method not allowed' });
-    }
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { token } = cookie.parse(req.headers.cookie || '');
-    if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+const createStripeAccountHandler = async (req, res) => {
+    await dbConnect();
+    const userId = req.user.userId;
 
     try {
-        const payload = await verifyToken(token);
-        if (!payload) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { userId, country, email, firstName, lastName, dob, address, city, postalCode, state, phone } = req.body;
-
-        await connectToDatabase();
-
         const user = await User.findById(userId);
-
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(400).json({ error: 'User not found' });
         }
 
-        // Ensure the phone number is in E.164 format
-        const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
+        // Create Stripe account
         const account = await stripe.accounts.create({
             type: 'custom',
-            country,
-            email,
+            country: 'GB',
+            email: user.email,
             business_type: 'individual',
-            business_profile: {
-                mcc: '0763', // Merchant category code for "Selling home grown produce"
-                product_description: 'Selling home grown produce',
-                name: `${firstName} ${lastName}`,
-            },
-            individual: {
-                first_name: firstName,
-                last_name: lastName,
-                dob: {
-                    day: dob.split('-')[2],
-                    month: dob.split('-')[1],
-                    year: dob.split('-')[0],
-                },
-                address: {
-                    line1: address,
-                    city,
-                    postal_code: postalCode,
-                    state,
-                    country,
-                },
-                phone: formattedPhone,
-            },
-            capabilities: {
-                transfers: { requested: true },
-                card_payments: { requested: true },
-            },
+            requested_capabilities: ['transfers'],
         });
 
+        // Update user with Stripe account ID
         user.stripeAccountId = account.id;
         await user.save();
 
+        // Create account link
         const accountLink = await stripe.accountLinks.create({
             account: account.id,
-            refresh_url: `${process.env.BASE_URL}/register/stripe-setup?userId=${user._id}`,
+            refresh_url: `${process.env.BASE_URL}/register`,
             return_url: `${process.env.BASE_URL}/dashboard`,
             type: 'account_onboarding',
         });
@@ -80,6 +39,12 @@ export default async function handler(req, res) {
         res.status(200).json({ url: accountLink.url });
     } catch (error) {
         console.error('Error creating Stripe account:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Failed to create Stripe account' });
     }
-}
+};
+
+const handler = async (req, res) => {
+    await authMiddleware(req, res, createStripeAccountHandler);
+};
+
+export default handler;

@@ -26,6 +26,20 @@ export default async function handler(req, res) {
             return res.status(409).json({ error: 'User already exists' });
         }
 
+        // Fetch latitude and longitude from postcodes.io
+        let latitude = null;
+        let longitude = null;
+        if (postalCode) {
+            const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postalCode)}`);
+            const data = await response.json();
+            if (data.status === 200) {
+                latitude = data.result.latitude;
+                longitude = data.result.longitude;
+            } else {
+                return res.status(400).json({ error: 'Invalid postcode' });
+            }
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
@@ -33,6 +47,9 @@ export default async function handler(req, res) {
             email,
             password: hashedPassword,
             isGardener,
+            postcode: postalCode,
+            latitude, // Add latitude to user document
+            longitude, // Add longitude to user document
             acceptedTerms: true,
             acceptedPrivacyPolicy: true,
             termsAcceptedDate: new Date()
@@ -108,9 +125,10 @@ export default async function handler(req, res) {
             const accountLink = await stripe.accountLinks.create({
                 account: account.id,
                 refresh_url: `${process.env.BASE_URL}/register/stripe-setup?userId=${user._id}`,
-                return_url: `${process.env.BASE_URL}/dashboard`,
+                return_url: `${process.env.BASE_URL}/dashboard?registered=true`,
                 type: 'account_onboarding',
             });
+
 
             return res.status(200).json({ url: accountLink.url });
         } else {

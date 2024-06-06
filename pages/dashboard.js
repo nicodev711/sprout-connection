@@ -7,10 +7,15 @@ import QuickActions from "@/components/dashboard/QuickActions";
 import Statistics from "@/components/dashboard/Statistics";
 import RecentOrdersBuyer from "@/components/dashboard/RecentOrdersBuyer";
 import RecentOrdersGardener from "@/components/dashboard/RecentOrdersGardener";
+import Image from 'next/image';
+import styles from '@/styles/Modal.module.css'; // Import custom styles
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [animationCount, setAnimationCount] = useState(0);
+    const maxAnimationCount = 5;
     const router = useRouter();
 
     useEffect(() => {
@@ -20,6 +25,10 @@ export default function Dashboard() {
                 if (!response.ok) throw new Error('User not authenticated');
                 const data = await response.json();
                 setUser(data.user);
+
+                if (router.query.registered === 'true' && data.user.isGardener) {
+                    setShowModal(true);
+                }
             } catch (error) {
                 router.push('/login');
             } finally {
@@ -29,6 +38,16 @@ export default function Dashboard() {
 
         fetchUser();
     }, [router]);
+
+    useEffect(() => {
+        if (showModal && animationCount < maxAnimationCount) {
+            const interval = setInterval(() => {
+                setAnimationCount((prevCount) => prevCount + 1);
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [showModal, animationCount]);
 
     if (loading) return <p>Loading...</p>;
 
@@ -40,9 +59,9 @@ export default function Dashboard() {
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
-            <RecentOrdersGardener/>
+            <RecentOrdersGardener />
             <QuickActions user={user} />
-            <Statistics/>
+            <Statistics />
         </div>
     );
 
@@ -54,7 +73,7 @@ export default function Dashboard() {
                 <p>Email: {user.email}</p>
                 <Link href={'/profile'} className="btn btn-primary mt-2">Edit Profile</Link>
             </section>
-            <RecentOrdersBuyer/>
+            <RecentOrdersBuyer />
             <section className="bg-white p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold">Wishlist</h2>
                 <ul>
@@ -75,15 +94,35 @@ export default function Dashboard() {
                 {user ? (
                     <>
                         {user.isGardener ? renderGardenerDashboard() : renderBuyerDashboard()}
-
-                        <PressRelease/>
-
-                        <Support/>
+                        <PressRelease />
+                        <Support />
                     </>
                 ) : (
                     <p>Please log in to access the dashboard.</p>
                 )}
             </main>
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className={`bg-white p-8 rounded-lg shadow-lg text-center ${animationCount < maxAnimationCount ? styles.modal : ''}`}>
+                        <Image
+                            src="/ModalGardener-Copy.png" // Ensure this path matches where you saved the image
+                            alt="Gardening Icon"
+                            width={300}
+                            height={300}
+                            className="mx-auto"
+                        />
+                        <h2 className="text-2xl font-bold mb-4 mt-2 text-green-600">Congratulations!</h2>
+                        <p>You have successfully registered as a Gardener.</p>
+                        <button
+                            className="btn btn-primary mt-4"
+                            onClick={() => setShowModal(false)}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

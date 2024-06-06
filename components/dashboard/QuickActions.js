@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import axios from 'axios';
 
 export default function QuickActions({ user }) {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [content, setContent] = useState('');
+    const [stripeAccountStatus, setStripeAccountStatus] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alert, setAlert] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+
+    useEffect(() => {
+        const checkStripeAccountStatus = async () => {
+            try {
+                const response = await axios.get('/api/stripe/check-account-status');
+                setStripeAccountStatus(response.data.accountStatus);
+            } catch (error) {
+                console.error('Failed to check Stripe account status:', error);
+            }
+        };
+
+        if (user.stripeAccountId) {
+            checkStripeAccountStatus();
+        }
+    }, [user.stripeAccountId]);
 
     const handleAlert = () => {
         setAlert(true);
@@ -18,37 +31,12 @@ export default function QuickActions({ user }) {
         }, 5000);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const response = await fetch('/api/press-release', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ title, description, content }),
-        });
-
-        if (response.ok) {
-            setTitle('');
-            setDescription('');
-            setContent('');
-            document.getElementById('my_modal_3').close();
-            setSuccessMessage('Press release added successfully!');
-            setTimeout(() => {
-                setSuccessMessage('');
-            }, 5000);
-        } else {
-            setError('Failed to add press release.');
-        }
-    };
-
     const handleCreateStripeAccount = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await axios.post('/api/create-stripe-account');
+            const response = await axios.post('/api/stripe/create-stripe-account');
             if (response.data.url) {
                 window.location.href = response.data.url; // Redirect to Stripe account onboarding
             } else {
@@ -57,6 +45,25 @@ export default function QuickActions({ user }) {
         } catch (error) {
             console.error('Failed to create Stripe account:', error);
             setError('Failed to create Stripe account');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCompleteStripeProfile = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await axios.post('/api/stripe/create-stripe-account');
+            if (response.data.url) {
+                window.location.href = response.data.url; // Redirect to Stripe account onboarding
+            } else {
+                setError('Failed to complete Stripe profile');
+            }
+        } catch (error) {
+            console.error('Failed to complete Stripe profile:', error);
+            setError('Failed to complete Stripe profile');
         } finally {
             setLoading(false);
         }
@@ -97,32 +104,23 @@ export default function QuickActions({ user }) {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {user.stripeAccountId ? (
-                    <Link href={"/products/add"} className={`btn btn-accent`}>
-                        Add New Product
-                    </Link>
+                    <>
+                        {stripeAccountStatus === 'complete' ? (
+                            <Link href={"/products/add"} className={`btn btn-accent`}>
+                                Add New Product
+                            </Link>
+                        ) : (
+                            <Link href={"/products/add"} className={`btn btn-accent disabled`} disabled>
+                                Add New Product
+                            </Link>
+                        )}
+                    </>
                 ) : (
-                    <button onClick={handleAlert} className="btn btn-accent">
+                    <button onClick={handleAlert} className="btn btn-accent" disabled>
                         Add New Product
                     </button>
                 )}
                 <Link href={"/products/manage"} className="btn btn-accent">Manage Products</Link>
-                {user.stripeAccountId ? (
-                    <button
-                        className="btn btn-accent"
-                        onClick={handleWithdrawFunds}
-                        disabled={loading}
-                    >
-                        {loading ? 'Withdrawing...' : 'Withdraw Funds'}
-                    </button>
-                ) : (
-                    <button
-                        className="btn btn-accent"
-                        onClick={handleCreateStripeAccount}
-                        disabled={loading}
-                    >
-                        {loading ? 'Creating Account...' : 'Create Stripe Account'}
-                    </button>
-                )}
                 <button className="btn btn-accent" disabled>View Messages</button>
                 <button className="btn btn-accent" disabled>Manage Settings</button>
             </div>

@@ -20,11 +20,14 @@ export default function RegistrationForm() {
         city: '',
         postalCode: '',
         state: '',
-        country: '',
+        country: 'GB',
         phone: '',
         bankAccountHolderName: '',
         bankAccountNumber: '',
-        sortCode: '',
+        routingNumber: '',
+        acceptedTerms:'',
+        acceptedPrivacyPolicy:'',
+
     });
 
     const handleChange = (input) => (e) => {
@@ -60,6 +63,7 @@ export default function RegistrationForm() {
         }
     };
 
+
     const renderFormStep = () => {
         switch (step) {
             case 0:
@@ -74,9 +78,10 @@ export default function RegistrationForm() {
     };
 
     return (
-        <div>
-            <h1>{steps[step]},.</h1>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
             {renderFormStep()}
+            </div>
         </div>
     );
 }

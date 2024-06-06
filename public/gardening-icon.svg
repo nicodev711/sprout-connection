@@ -1,0 +1,16 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="200" height="200" fill="#C5DCA3" />
+
+    <!-- Gardener -->
+    <path d="M50 150 L70 100 L90 120 L80 170 Z" fill="#000" />
+    <path d="M80 170 L70 120 L90 100 L110 150 Z" fill="#000" />
+    <rect x="90" y="50" width="20" height="10" fill="#000" transform="rotate(-45 100 100)" />
+
+    <!-- Shovel -->
+    <line x1="100" y1="120" x2="150" y2="170" stroke="#000" stroke-width="5" />
+    <rect x="145" y="165" width="10" height="10" fill="#000" />
+
+    <!-- Seed -->
+    <circle cx="160" cy="180" r="5" fill="#8B4513" />
+</svg>
