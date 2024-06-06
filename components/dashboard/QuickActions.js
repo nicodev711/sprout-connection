@@ -9,28 +9,6 @@ export default function QuickActions({ user }) {
     const [alert, setAlert] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    useEffect(() => {
-        const checkStripeAccountStatus = async () => {
-            try {
-                const response = await axios.get('/api/stripe/check-account-status');
-                setStripeAccountStatus(response.data.accountStatus);
-            } catch (error) {
-                console.error('Failed to check Stripe account status:', error);
-            }
-        };
-
-        if (user.stripeAccountId) {
-            checkStripeAccountStatus();
-        }
-    }, [user.stripeAccountId]);
-
-    const handleAlert = () => {
-        setAlert(true);
-        setTimeout(() => {
-            setAlert(false);
-        }, 5000);
-    };
-
     const handleCreateStripeAccount = async () => {
         setLoading(true);
         setError(null);
@@ -50,38 +28,11 @@ export default function QuickActions({ user }) {
         }
     };
 
-    const handleCompleteStripeProfile = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await axios.post('/api/stripe/create-stripe-account');
-            if (response.data.url) {
-                window.location.href = response.data.url; // Redirect to Stripe account onboarding
-            } else {
-                setError('Failed to complete Stripe profile');
-            }
-        } catch (error) {
-            console.error('Failed to complete Stripe profile:', error);
-            setError('Failed to complete Stripe profile');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleWithdrawFunds = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await axios.post('/api/withdraw-funds');
-            alert('Withdrawal initiated successfully');
-        } catch (error) {
-            console.error('Failed to withdraw funds:', error);
-            setError('Failed to withdraw funds');
-        } finally {
-            setLoading(false);
-        }
+    const handleAlert = () => {
+        setAlert(true);
+        setTimeout(() => {
+            setAlert(false);
+        }, 5000);
     };
 
     return (
@@ -104,23 +55,26 @@ export default function QuickActions({ user }) {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {user.stripeAccountId ? (
-                    <>
-                        {stripeAccountStatus === 'complete' ? (
-                            <Link href={"/products/add"} className={`btn btn-accent`}>
-                                Add New Product
-                            </Link>
-                        ) : (
-                            <Link href={"/products/add"} className={`btn btn-accent disabled`} disabled>
-                                Add New Product
-                            </Link>
-                        )}
-                    </>
-                ) : (
-                    <button onClick={handleAlert} className="btn btn-accent" disabled>
+                    <Link href={"/products/add"} className={`btn btn-accent`}>
                         Add New Product
+                    </Link>
+                ) : (
+                    <button onClick={handleAlert} className="btn btn-base-100 disabled">
+                    Add New Product
                     </button>
                 )}
-                <Link href={"/products/manage"} className="btn btn-accent">Manage Products</Link>
+                {user.stripeAccountId ? (
+                    <Link href={"/products/manage"} className="btn btn-accent">Manage Products</Link>
+                ) : (
+                    <button
+                        className="btn btn-accent"
+                        onClick={handleCreateStripeAccount}
+                        disabled={loading}
+                    >
+                        {loading ? 'Creating Account...' : 'Create Stripe Account'}
+                    </button>
+                )}
+
                 <button className="btn btn-accent" disabled>View Messages</button>
                 <button className="btn btn-accent" disabled>Manage Settings</button>
             </div>
