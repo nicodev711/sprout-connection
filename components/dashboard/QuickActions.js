@@ -116,6 +116,7 @@ export default function QuickActions({user}) {
                         >
                             Add Press Release
                         </button>
+                        <Link href={"/admin"} className="btn btn-accent">Admin Panel</Link>
                         <dialog id="my_modal_3" className="modal">
                             <div className="modal-box">
                                 <form onSubmit={handleSubmit}>
