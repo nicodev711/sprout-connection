@@ -115,7 +115,7 @@ export default function Profile() {
                             onChange={(e) => setPostcode(e.target.value)}
                         />
                     </div>
-                    <div className="mb-4 flex items-center">
+                    <div className="mb-4 hidden">
                         <input
                             id="isGardener"
                             type="checkbox"
