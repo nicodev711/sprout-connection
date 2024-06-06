@@ -52,12 +52,17 @@ export default function RegistrationForm() {
                 // Handle successful registration
                 const data = await response.json();
                 if (data.url) {
-                    window.location.href = data.url; // Redirect to Stripe onboarding
+                    if (data.url.startsWith('https://')) {
+                        window.location.href = data.url; // Redirect to Stripe onboarding
+                    } else {
+                        alert('The URL provided is not secure (HTTPS).');
+                    }
                 }
             } else {
                 const errorData = await response.json();
                 alert(`Failed to register: ${errorData.error || 'Unknown error'}`);
             }
+
         } catch (error) {
             console.error('Failed to register:', error);
         }
