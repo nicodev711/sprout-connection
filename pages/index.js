@@ -9,7 +9,7 @@ export default function Home() {
     return (
         <div className="bg-background text-text min-h-screen">
             <Head>
-                <title>Sprout Connections - Fresh Garden Produce from Your Neighbors</title>
+                <title>Sprout Connections - Fresh Garden Produce from Your Neighbours</title>
                 <meta name="description"
                       content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
                 <meta name="keywords" content={combinedKeywords}/>
