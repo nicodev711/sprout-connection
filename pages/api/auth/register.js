@@ -109,8 +109,8 @@ export default async function handler(req, res) {
 
             const accountLink = await stripe.accountLinks.create({
                 account: account.id,
-                refresh_url: `${process.env.RAILWAY_PUBLIC_DOMAIN}/register/stripe-setup?userId=${user._id}`,
-                return_url: `${process.env.RAILWAY_PUBLIC_DOMAIN}/dashboard?registered=true`,
+                refresh_url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/register/stripe-setup?userId=${user._id}`,
+                return_url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/dashboard?registered=true`,
                 type: 'account_onboarding',
             });
 
