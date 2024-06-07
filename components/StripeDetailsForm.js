@@ -2,6 +2,13 @@ import { useState } from "react";
 
 export default function StripeDetailsForm({ prevStep, handleChange, userData, handleSubmit }) {
     const [phoneError, setPhoneError] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    const handleFormSubmit = async () => {
+        setSubmitting(true);
+        await handleSubmit();
+        setTimeout(()=>{setSubmitting(false);}, 3000)
+    };
 
     const handlePhoneChange = (e) => {
         let value = e.target.value;
@@ -20,7 +27,6 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                 <ul className="steps steps-vertical lg:steps-horizontal">
                     <li className="step step-primary"></li>
                     <li className="step step-primary"></li>
-                    <li className="step"></li>
                     <li className="step"></li>
                 </ul>
             </div>
@@ -128,10 +134,15 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     Back
                 </button>
                 <button
-                    onClick={handleSubmit}
+                    onClick={handleFormSubmit}
                     className="btn btn-primary"
+                    disabled={submitting} // Disable the button while submitting
                 >
-                    Submit
+                    {submitting ? (
+                        <span className="loading loading-spinner loading-md"></span> // Show loading spinner
+                    ) : (
+                        "Submit"
+                    )}
                 </button>
             </div>
         </div>
