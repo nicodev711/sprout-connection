@@ -1,6 +1,6 @@
-import {useState} from "react";
+import { useState } from "react";
 
-export default function StripeDetailsForm({ prevStep, handleChange, userData, nextStep }) {
+export default function StripeDetailsForm({ prevStep, handleChange, userData, handleSubmit }) {
     const [phoneError, setPhoneError] = useState('');
 
     const handlePhoneChange = (e) => {
@@ -24,7 +24,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ne
                     <li className="step"></li>
                 </ul>
             </div>
-            <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Account Details</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Stripe Account Details</h1>
             <div className="mb-4">
                 <input
                     type="text"
@@ -128,10 +128,10 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ne
                     Back
                 </button>
                 <button
-                    onClick={nextStep}
+                    onClick={handleSubmit}
                     className="btn btn-primary"
                 >
-                    Next
+                    Submit
                 </button>
             </div>
         </div>

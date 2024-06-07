@@ -33,7 +33,6 @@ export default function BasicDetailsForm({ handleChange, userData, nextStep }) {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Register</h1>
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
