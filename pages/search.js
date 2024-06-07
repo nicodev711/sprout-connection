@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import SearchBar from '@/components/SearchBar';
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 
 const truncateText = (text, maxLength) => {
     if (text.length > maxLength) {
@@ -32,6 +33,15 @@ const SearchPage = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
+            <Head>
+                <title>Sprout Connections - Search</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <aside className="w-full bg-gray-100 p-4 rounded-lg shadow-md mb-4 lg:hidden">
                 <h2 className="text-xl font-bold mb-4">Search</h2>
                 <SearchBar initialQuery={query} initialCategory={category} initialPostcode={postcode} initialRange={range} />

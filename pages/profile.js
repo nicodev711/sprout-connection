@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
+import Head from "next/head";
 
 export default function Profile() {
     const { user, setUser, fetchUser } = useUser();
@@ -67,6 +68,15 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <Head>
+                <title>Sprout Connections - Profile</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Profile</h1>
                 <form onSubmit={handleSubmit}>

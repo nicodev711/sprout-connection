@@ -1,8 +1,18 @@
 import React from 'react';
+import Head from "next/head";
 
 const TermsAndConditions = () => {
     return (
         <div className="container mx-auto p-4 bg-white shadow-md rounded-lg">
+            <Head>
+                <title>Sprout Connections - Terms and Conditions</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <h1 className="text-3xl font-bold mb-6 text-center">Terms and Conditions</h1>
             <p className="text-gray-600 mb-4">Last updated: 03/06/2024</p>
 

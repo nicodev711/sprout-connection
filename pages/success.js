@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
 import axios from 'axios';
 import Link from "next/link";
+import Head from "next/head";
 
 const Success = () => {
     const { user, basket, clearBasket } = useUser();
@@ -31,6 +32,15 @@ const Success = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+            <Head>
+                <title>Sprout Connections - Payment Successful</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-center">
                 <h1 className="text-2xl font-bold mb-6 text-green-600">Payment Successful!</h1>
                 <p className="text-lg mb-4">Thank you for your purchase. Your order will be processed shortly.</p>

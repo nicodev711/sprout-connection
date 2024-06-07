@@ -1,6 +1,7 @@
 import { useUser } from '@/contexts/UserContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { useState } from 'react';
+import Head from "next/head";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
@@ -69,6 +70,15 @@ const Checkout = () => {
 
     return (
         <div>
+            <Head>
+                <title>Sprout Connections - Checkout</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <h1>Checkout</h1>
             <button onClick={handleCheckout} disabled={loading}>
                 {loading ? 'Loading...' : 'Proceed to Checkout'}
