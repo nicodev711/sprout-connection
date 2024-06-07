@@ -1,10 +1,8 @@
-// components/RegistrationForm.js
 import { useState } from 'react';
 import BasicDetailsForm from './BasicDetailsForm';
 import StripeDetailsForm from './StripeDetailsForm';
-import BankDetailsForm from './BankDetailsForm';
 
-const steps = ['Basic Details', 'Stripe Details', 'Bank Details'];
+const steps = ['1', '2'];
 
 export default function RegistrationForm() {
     const [step, setStep] = useState(0);
@@ -22,12 +20,8 @@ export default function RegistrationForm() {
         state: '',
         country: 'GB',
         phone: '',
-        bankAccountHolderName: '',
-        bankAccountNumber: '',
-        routingNumber: '',
-        acceptedTerms:'',
-        acceptedPrivacyPolicy:'',
-
+        acceptedTerms: '',
+        acceptedPrivacyPolicy: ''
     });
 
     const handleChange = (input) => (e) => {
@@ -62,21 +56,17 @@ export default function RegistrationForm() {
                 const errorData = await response.json();
                 alert(`Failed to register: ${errorData.error || 'Unknown error'}`);
             }
-
         } catch (error) {
             console.error('Failed to register:', error);
         }
     };
-
 
     const renderFormStep = () => {
         switch (step) {
             case 0:
                 return <BasicDetailsForm handleChange={handleChange} userData={userData} nextStep={nextStep} />;
             case 1:
-                return userData.isGardener ? <StripeDetailsForm handleChange={handleChange} userData={userData} prevStep={prevStep} nextStep={nextStep} /> : handleSubmit();
-            case 2:
-                return userData.isGardener ? <BankDetailsForm handleChange={handleChange} userData={userData} prevStep={prevStep} handleSubmit={handleSubmit} /> : null;
+                return userData.isGardener ? <StripeDetailsForm handleChange={handleChange} userData={userData} prevStep={prevStep} handleSubmit={handleSubmit} /> : handleSubmit();
             default:
                 return null;
         }
@@ -85,7 +75,8 @@ export default function RegistrationForm() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-            {renderFormStep()}
+                <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Register</h1>
+                {renderFormStep()}
             </div>
         </div>
     );

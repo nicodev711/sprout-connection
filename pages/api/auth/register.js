@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    const { username, email, password, isGardener, firstName, lastName, dob, address, city, postalCode, state, country, phone, bankAccountHolderName, bankAccountNumber, routingNumber } = req.body;
+    const { username, email, password, isGardener, firstName, lastName, dob, address, city, postalCode, state, country, phone } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
@@ -107,28 +107,12 @@ export default async function handler(req, res) {
             user.stripeAccountId = account.id;
             await user.save();
 
-            const bankAccount = await stripe.accounts.createExternalAccount(
-                account.id,
-                {
-                    external_account: {
-                        object: 'bank_account',
-                        country,
-                        currency: 'gbp',
-                        account_holder_name: bankAccountHolderName,
-                        account_holder_type: 'individual',
-                        routing_number: routingNumber,
-                        account_number: bankAccountNumber,
-                    },
-                }
-            );
-
             const accountLink = await stripe.accountLinks.create({
                 account: account.id,
-                refresh_url: `https://www.${process.env.RAILWAY_PUBLIC_DOMAIN}/register/stripe-setup?userId=${user._id}`,
-                return_url: `https://www.${process.env.RAILWAY_PUBLIC_DOMAIN}/dashboard?registered=true`,
+                refresh_url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/register/stripe-setup?userId=${user._id}`,
+                return_url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/dashboard?registered=true`,
                 type: 'account_onboarding',
             });
-
 
             return res.status(200).json({ url: accountLink.url });
         } else {
