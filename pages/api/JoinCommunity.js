@@ -29,23 +29,26 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Error adding contact to Brevo:', error.message);
 
-        // Send a more descriptive error message based on the type of error
         if (error.response) {
-            // The request was made and the server responded with a status code outside the range of 2xx
-            console.error('Error response data:', error.response.data);
-            res.status(error.response.status).json({
-                message: 'Error adding contact to Brevo',
-                error: error.response.data
-            });
+            const errorCode = error.response.data.code;
+            const errorMessage = error.response.data.message;
+
+            if (errorCode === 'duplicate_parameter' && errorMessage === 'Contact already exist') {
+                res.status(409).json({ message: 'Email already exists', error: error.response.data });
+            } else {
+                console.error('Error response data:', error.response.data);
+                res.status(error.response.status).json({
+                    message: 'Error adding contact to Brevo',
+                    error: error.response.data
+                });
+            }
         } else if (error.request) {
-            // The request was made but no response was received
             console.error('Error request data:', error.request);
             res.status(500).json({
                 message: 'Error adding contact to Brevo',
                 error: 'No response received from Brevo API'
             });
         } else {
-            // Something happened in setting up the request that triggered an Error
             res.status(500).json({
                 message: 'Error adding contact to Brevo',
                 error: error.message

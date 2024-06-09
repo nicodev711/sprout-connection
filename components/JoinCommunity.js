@@ -15,7 +15,11 @@ export default function JoinCommunity() {
             setSuccess('Thank you for joining our community!');
             setError(null);
         } catch (error) {
-            setError('There was an error signing up. Please try again.');
+            if (error.response && error.response.status === 409) {
+                setError('This email already exist.');
+            } else {
+                setError('There was an error signing up. Please try again.');
+            }
             setSuccess(null);
         }
     };
