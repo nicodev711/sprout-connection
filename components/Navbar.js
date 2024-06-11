@@ -35,6 +35,7 @@ const Navbar = () => {
                     </div>
                     <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-52">
                         <li><Link href={'/search'}>Search</Link></li>
+                        <li><Link href={'/faq'}>FAQ&#39;s</Link></li>
                         {user ? (<>
                             <li><Link href={'/dashboard'}>Dashboard</Link></li>
                         </>) : (<></>)}

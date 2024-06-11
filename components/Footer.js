@@ -6,14 +6,17 @@ export default function Footer() {
             <p>&copy; {new Date().getFullYear()} Sprout Connections. All rights reserved.</p>
             <nav className="mt-4">
                 <Link href="/terms-and-conditions" className="link link-hover mx-2 text-white">
-                   Terms and Conditions
+                    Terms and Conditions
                 </Link>
                 <Link href="/privacy-policy" className="link link-hover mx-2 text-white">
                     Privacy Policy
                 </Link>
-                <a href="#" className="link link-hover mx-2">About Us</a>
-                <a href="#" className="link link-hover mx-2">Contact</a>
-                <a href="#" className="link link-hover mx-2">FAQs</a>
+                <a href="#" className="link link-hover mx-2 hidden">About Us</a>
+                <a href="mailto:contact@sproutconnections.com"
+                   className="link link-hover mx-2">Contact</a>
+                <Link href="/faq" className="link link-hover mx-2 text-white">
+                    FAQs
+                </Link>
             </nav>
         </footer>
     )
