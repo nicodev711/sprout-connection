@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         user.postcode = postcode;
         user.latitude = latitude;
         user.longitude = longitude;
-        console.log(user)
+        console.log(`user updated: ${user}`)
         await user.save();
 
         res.status(200).json({ message: 'Profile updated successfully' });

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { signToken } from '@/lib/jwt';
 import cookie from 'cookie';
 import stripe from '@/lib/stripe';
+import axios from "axios";
 
 export default async function handler(req, res) {
     // Only allow POST requests
@@ -73,6 +74,26 @@ export default async function handler(req, res) {
             path: '/'
         }));
 
+        // Brevo API call to add user to list
+        const brevoAddUserToList = async (email, firstName, listIds) => {
+            try {
+                await axios.post('https://api.sendinblue.com/v3/contacts', {
+                    email: email,
+                    attributes: {
+                        FIRSTNAME: firstName,
+                    },
+                    listIds: listIds
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'api-key': process.env.SENDINBLUE_API_KEY
+                    }
+                });
+            } catch (error) {
+                console.error('Error adding user to Brevo list:', error.response ? error.response.data : error.message);
+            }
+        };
+
         if (isGardener) {
             // If the user is a gardener, format the phone number and create a Stripe account
             const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
@@ -125,9 +146,14 @@ export default async function handler(req, res) {
                 type: 'account_onboarding',
             });
 
+            // Add user to the gardener list in Brevo
+            await brevoAddUserToList(email, firstName, [10, 12]);
+
             // Respond with the account onboarding URL
             return res.status(200).json({ url: accountLink.url });
         } else {
+            // Add user to the non-gardener list in Brevo
+            await brevoAddUserToList(email, firstName, [10, 11]);
             // If the user is not a gardener, simply respond with a success message
             return res.status(201).json({ message: 'User created', userId: user._id });
         }
