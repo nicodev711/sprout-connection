@@ -77,20 +77,43 @@ export default async function handler(req, res) {
         // Brevo API call to add user to list
         const brevoAddUserToList = async (email, firstName, listIds) => {
             try {
-                await axios.post('https://api.sendinblue.com/v3/contacts', {
-                    email: email,
-                    attributes: {
-                        FIRSTNAME: firstName,
-                    },
-                    listIds: listIds
-                }, {
+                // Check if the user already exists
+                const { data: existingContact } = await axios.get(`https://api.sendinblue.com/v3/contacts/${email}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'api-key': process.env.SENDINBLUE_API_KEY
                     }
                 });
+
+                if (existingContact) {
+                    // If the user exists, update their contact to add them to the new list(s)
+                    await axios.put(`https://api.sendinblue.com/v3/contacts/${email}`, {
+                        listIds: [...new Set([...existingContact.listIds, ...listIds])]
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': process.env.SENDINBLUE_API_KEY
+                        }
+                    });
+                }
             } catch (error) {
-                console.error('Error adding user to Brevo list:', error.response ? error.response.data : error.message);
+                if (error.response && error.response.status === 404) {
+                    // If the user does not exist, create a new contact
+                    await axios.post('https://api.sendinblue.com/v3/contacts', {
+                        email: email,
+                        attributes: {
+                            FIRSTNAME: firstName,
+                        },
+                        listIds: listIds
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': process.env.SENDINBLUE_API_KEY
+                        }
+                    });
+                } else {
+                    console.error('Error adding/updating user in Brevo list:', error.response ? error.response.data : error.message);
+                }
             }
         };
 
