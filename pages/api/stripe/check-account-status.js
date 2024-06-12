@@ -1,4 +1,3 @@
-// pages/api/stripe/check-account-status.js
 import Stripe from 'stripe';
 import { authMiddleware } from '@/lib/middleware';
 import User from '@/models/User';
@@ -13,24 +12,17 @@ const checkAccountStatusHandler = async (req, res) => {
     try {
         const user = await User.findById(userId);
         if (!user || !user.stripeAccountId) {
-            console.log(`User not found or no Stripe account: UserID=${userId}`);
             return res.status(400).json({ error: 'Stripe account not found' });
         }
 
         const account = await stripe.accounts.retrieve(user.stripeAccountId);
         const capabilities = account.capabilities;
+        const requirements = account.requirements.currently_due || [];
 
-        console.log(`Stripe account capabilities: ${JSON.stringify(capabilities)}`);
-        console.log(`Stripe account requirements: ${JSON.stringify(account.requirements)}`);
-
-        if (capabilities.transfers === 'active' && account.requirements.disabled_reason === null) {
+        if (capabilities.transfers === 'active' && requirements.length === 0) {
             return res.status(200).json({ accountStatus: 'complete' });
         } else {
-            return res.status(200).json({
-                accountStatus: 'incomplete',
-                requirements: account.requirements.currently_due,
-                disabledReason: account.requirements.disabled_reason
-            });
+            return res.status(200).json({ accountStatus: 'incomplete', requirements });
         }
     } catch (error) {
         console.error('Error checking Stripe account status:', error);
