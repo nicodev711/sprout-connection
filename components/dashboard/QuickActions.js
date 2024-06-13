@@ -1,3 +1,4 @@
+// components/QuickActions.js
 import { useState, useEffect } from 'react';
 import Link from "next/link";
 import axios from 'axios';
@@ -131,6 +132,7 @@ export default function QuickActions({ user }) {
                         Add Press Release
                     </button>
                     <Link href={"/admin"} className="btn btn-accent">Admin Panel</Link>
+                    <Link href={"/admin/stripe-accounts"} className="btn btn-accent">Manage Stripe Accounts</Link>
                     <dialog id="my_modal_3" className="modal">
                         <div className="modal-box">
                             <form onSubmit={handleSubmit}>

@@ -60,7 +60,11 @@ const UserSchema = new mongoose.Schema({
     },
     termsAcceptedDate: {
         type: Date,
-    }
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
+    },
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
