@@ -1,41 +1,33 @@
-import connectToDatabase from '@/lib/mongoose';
+import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
-import { verifyToken } from '@/lib/jwt';
-import cookie from 'cookie';
+import { authMiddleware } from '@/lib/middleware';
 
-export default async function handler(req, res) {
+const orderHandler = async (req, res) => {
+    await dbConnect();
+
     const { id } = req.query;
 
-    if (req.method !== 'GET') {
-        return res.status(405).json({ message: 'Method not allowed' });
-    }
+    if (req.method === 'GET') {
+        try {
+            const order = await Order.findById(id)
+                .populate('buyerId')
+                .populate('gardenerIds')
+                .populate('products.productId');
 
-    const { token } = cookie.parse(req.headers.cookie || '');
-    if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
 
-    try {
-        const payload = await verifyToken(token);
-        if (!payload) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            res.status(200).json(order);
+        } catch (error) {
+            console.error('Failed to fetch order:', error);
+            res.status(500).json({ error: 'Failed to fetch order' });
         }
-
-        await connectToDatabase();
-
-        const order = await Order.findById(id).populate('products.productId');
-        if (!order) {
-            return res.status(404).json({ error: 'Order not found' });
-        }
-
-        // Ensure the user making the request is the buyer or one of the gardener involved in the order
-        if (order.buyerId.toString() !== payload.userId && !order.gardenerIds.includes(payload.userId)) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-
-        res.status(200).json(order);
-    } catch (error) {
-        console.error('Error fetching order details:', error);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    } else {
+        res.status(405).json({ error: 'Method not allowed' });
     }
-}
+};
+
+export default async (req, res) => {
+    await authMiddleware(req, res, orderHandler);
+};

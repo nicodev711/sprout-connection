@@ -36,7 +36,7 @@ const RenderGardenerDashboard = () => {
                         <li key={order._id} className="mb-2">
                             <Link href={`/orders/${order._id}`} className="text-blue-500 hover:underline">
                                 Order #{order._id.slice(-4)} - {order.products.map(p => (
-                                p.productId ? `${p.productId.title} (${p.quantity}${p.productId.units ? ` ${p.productId.units}` : ' units'})` : 'Product not found'
+                                `${p.name} (${p.quantity}${p.units ? ` ${p.units}` : ' units'})`
                             )).join(', ')} - {order.status}
                             </Link>
                         </li>

@@ -1,4 +1,3 @@
-// models/Order.js
 import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
@@ -18,12 +17,36 @@ const OrderSchema = new mongoose.Schema({
             ref: 'Product',
             required: true,
         },
+        name: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
         quantity: {
+            type: Number,
+            required: true,
+        },
+        total: {
             type: Number,
             required: true,
         }
     }],
-    total: { // Ensure this field name matches what is being used in the code
+    totalProductAmount: {
+        type: Number,
+        required: true,
+    },
+    serviceFee: {
+        type: Number,
+        required: true,
+    },
+    smallOrderFee: {
+        type: Number,
+        required: true,
+    },
+    total: {
         type: Number,
         required: true,
     },

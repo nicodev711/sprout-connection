@@ -1,4 +1,3 @@
-// pages/api/checkout.js
 import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Basket from '@/models/Basket';
@@ -95,13 +94,19 @@ const checkoutHandler = async (req, res) => {
         // Create order here
         const products = userBasket.items.map(item => ({
             productId: item.productId._id,
+            name: item.productId.title,
+            price: item.productId.price,
             quantity: item.quantity,
+            total: (item.productId.price * item.quantity).toFixed(2),
         }));
 
         const order = new Order({
             buyerId: userId,
             gardenerIds,
             products,
+            totalProductAmount: parseFloat(totalProductAmount),
+            serviceFee: parseFloat(serviceFee),
+            smallOrderFee: parseFloat(smallOrderFee),
             total: parseFloat(total),
         });
 

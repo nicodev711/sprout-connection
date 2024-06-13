@@ -1,4 +1,3 @@
-// pages/api/index.js
 import { authMiddleware } from '@/lib/middleware';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
@@ -20,8 +19,13 @@ const ordersHandler = async (req, res) => {
             const gardenerIds = [...new Set(userBasket.items.map(item => item.productId.userId))];
             const products = userBasket.items.map(item => ({
                 productId: item.productId._id,
+                name: item.productId.name,
+                price: item.productId.price,
+                units: item.productId.units,
                 quantity: item.quantity,
+                total: (item.productId.price * item.quantity).toFixed(2),
             }));
+
             const totalProductAmount = userBasket.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
             const serviceFee = (totalProductAmount * 0.1).toFixed(2);
             const smallOrderFee = totalProductAmount < 5 ? 0.30 : 0;
@@ -31,7 +35,10 @@ const ordersHandler = async (req, res) => {
                 buyerId,
                 gardenerIds,
                 products,
-                total: parseFloat(total), // Ensure total is a number with two decimal places
+                totalProductAmount: parseFloat(totalProductAmount),
+                serviceFee: parseFloat(serviceFee),
+                smallOrderFee: parseFloat(smallOrderFee),
+                total: parseFloat(total),
             });
 
             await order.save();
