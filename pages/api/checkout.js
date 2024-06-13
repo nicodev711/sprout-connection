@@ -81,7 +81,7 @@ const checkoutHandler = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${req.headers.origin}/success`,
+            success_url: `${req.headers.origin}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${req.headers.origin}/cancel`,
             payment_intent_data: {
                 application_fee_amount: Math.round((parseFloat(serviceFee) + parseFloat(smallOrderFee)) * 100), // Platform fee in cents
@@ -90,38 +90,6 @@ const checkoutHandler = async (req, res) => {
                 },
             },
         });
-
-        // Create order here
-        const products = userBasket.items.map(item => ({
-            productId: item.productId._id,
-            name: item.productId.title,
-            price: item.productId.price,
-            quantity: item.quantity,
-            total: (item.productId.price * item.quantity).toFixed(2),
-        }));
-
-        const order = new Order({
-            buyerId: userId,
-            gardenerIds,
-            products,
-            totalProductAmount: parseFloat(totalProductAmount),
-            serviceFee: parseFloat(serviceFee),
-            smallOrderFee: parseFloat(smallOrderFee),
-            total: parseFloat(total),
-        });
-
-        await order.save();
-
-        // Update the withdrawable amount for each gardener, excluding fees
-        await Promise.all(gardenerIds.map(async gardenerId => {
-            const gardener = await User.findById(gardenerId);
-            if (gardener) {
-                gardener.withdrawableAmount += parseFloat(totalProductAmount);
-                await gardener.save();
-            }
-        }));
-
-        await Basket.deleteOne({ userId });
 
         res.status(200).json({ url: session.url });
     } catch (error) {
