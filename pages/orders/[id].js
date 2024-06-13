@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Messages from '@/components/Messages';
 import { useUser } from '@/contexts/UserContext';
+import Head from "next/head";
 
 export default function OrderDetails() {
     const router = useRouter();
@@ -35,6 +36,15 @@ export default function OrderDetails() {
 
     return (
         <div className="min-h-screen p-4">
+            <Head>
+                <title>Sprout Connections - Order Details</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <h1 className="text-2xl font-bold mb-4">Order Details</h1>
             <div className="bg-white p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold mb-2">Order #{order._id.slice(-4)}</h2>

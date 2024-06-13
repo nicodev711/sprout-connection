@@ -75,7 +75,7 @@ export default function BasicDetailsForm({ handleChange, userData, nextStep }) {
                         checked={userData.isGardener}
                         onChange={handleChange('isGardener')}
                     />
-                    <label htmlFor="isGardener" className="text-gray-700">Register as Gardener</label>
+                    <label htmlFor="isGardener" className="text-gray-700">Start selling my home-grown produce</label>
                 </div>
                 <div className="mb-4 flex items-center">
                     <input

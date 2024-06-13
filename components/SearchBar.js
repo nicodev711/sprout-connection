@@ -1,13 +1,20 @@
-// components/SearchBar.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useUser } from '@/contexts/UserContext';
 
-const SearchBar = ({ initialQuery = '', initialCategory = '', initialPostcode = '', initialRange = 5 }) => {
+const SearchBar = ({ initialQuery = '', initialCategory = '', initialRange = 5 }) => {
     const router = useRouter();
+    const { user } = useUser();
     const [searchQuery, setSearchQuery] = useState(initialQuery);
     const [category, setCategory] = useState(initialCategory);
-    const [postcode, setPostcode] = useState(initialPostcode);
+    const [postcode, setPostcode] = useState(user ? user.postcode : '');
     const [range, setRange] = useState(initialRange);
+
+    useEffect(() => {
+        if (user && user.postcode) {
+            setPostcode(user.postcode);
+        }
+    }, [user]);
 
     const handleSearch = () => {
         router.push(`/search?query=${searchQuery}&category=${category}&postcode=${postcode}&range=${range}`);

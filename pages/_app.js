@@ -7,6 +7,7 @@ import Head from 'next/head';
 import Script from "next/script";
 import keywords from '@/utils/keywords';
 
+
 export default function MyApp({ Component, pageProps }) {
     return (
         <>

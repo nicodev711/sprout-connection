@@ -3,21 +3,44 @@ import { useState } from "react";
 export default function StripeDetailsForm({ prevStep, handleChange, userData, handleSubmit }) {
     const [phoneError, setPhoneError] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
+
+    const validateForm = () => {
+        const errors = {};
+        if (!userData.firstName) errors.firstName = 'First Name is required';
+        if (!userData.lastName) errors.lastName = 'Last Name is required';
+        if (!userData.dob) errors.dob = 'Date of Birth is required';
+        if (!userData.address) errors.address = 'Address is required';
+        if (!userData.city) errors.city = 'City is required';
+        if (!userData.postalCode) errors.postalCode = 'Postal Code is required';
+        if (!userData.phone) errors.phone = 'Phone number is required';
+        return errors;
+    };
 
     const handleFormSubmit = async () => {
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
         setSubmitting(true);
         await handleSubmit();
-        setTimeout(()=>{setSubmitting(false);}, 3000)
+        setTimeout(() => { setSubmitting(false); }, 3000);
     };
 
     const handlePhoneChange = (e) => {
         let value = e.target.value;
-        if (value.startsWith('0')) {
+
+        // Validate phone number to ensure it doesn't start with letters, symbols, or 0
+        if (!/^\d+$/.test(value)) {
+            setPhoneError('Phone number should only contain digits');
+        } else if (value.startsWith('0')) {
             setPhoneError('Phone number should not start with 0');
         } else {
             setPhoneError('');
             value = '+44' + value; // Ensure the phone number starts with +44
         }
+
         handleChange('phone')({ target: { value } });
     };
 
@@ -40,6 +63,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.firstName && <p className="text-red-500 text-sm mt-2">{formErrors.firstName}</p>}
             </div>
             <div className="mb-4">
                 <input
@@ -50,6 +74,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.lastName && <p className="text-red-500 text-sm mt-2">{formErrors.lastName}</p>}
             </div>
             <div className="mb-4">
                 <input
@@ -60,6 +85,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.dob && <p className="text-red-500 text-sm mt-2">{formErrors.dob}</p>}
             </div>
             <div className="mb-4">
                 <input
@@ -70,6 +96,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.address && <p className="text-red-500 text-sm mt-2">{formErrors.address}</p>}
             </div>
             <div className="mb-4">
                 <input
@@ -80,6 +107,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.city && <p className="text-red-500 text-sm mt-2">{formErrors.city}</p>}
             </div>
             <div className="mb-4">
                 <input
@@ -90,6 +118,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.postalCode && <p className="text-red-500 text-sm mt-2">{formErrors.postalCode}</p>}
             </div>
             <div className="mb-4 hidden">
                 <input
@@ -100,6 +129,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.state && <p className="text-red-500 text-sm mt-2">{formErrors.state}</p>}
             </div>
             <div className="mb-4 hidden">
                 <input
@@ -110,11 +140,11 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     required
                     className="input input-bordered w-full"
                 />
+                {formErrors.country && <p className="text-red-500 text-sm mt-2">{formErrors.country}</p>}
             </div>
             <div className="mb-4">
                 <div className="flex items-center">
-                    <span
-                        className="input input-bordered border-r-0 rounded-r-none flex items-center justify-center">+44</span>
+                    <span className="input input-bordered border-r-0 rounded-r-none flex items-center justify-center">+44</span>
                     <input
                         type="text"
                         placeholder="Phone"
@@ -125,6 +155,7 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
                     />
                 </div>
                 {phoneError && <p className="text-red-500 text-sm mt-2">{phoneError}</p>}
+                {formErrors.phone && <p className="text-red-500 text-sm mt-2">{formErrors.phone}</p>}
             </div>
             <div className="flex justify-between mt-6">
                 <button

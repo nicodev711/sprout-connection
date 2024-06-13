@@ -6,7 +6,13 @@ export default function PrivacyPolicy() {
     return (
         <div className="container mx-auto p-4">
             <Head>
-                <title>Privacy Policy</title>
+                <title>Sprout Connections - Privacy Policy</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
             </Head>
             <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
             <p>Last updated: 3/06/2024</p>

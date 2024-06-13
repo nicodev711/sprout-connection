@@ -8,7 +8,8 @@ import Statistics from "@/components/dashboard/Statistics";
 import RecentOrdersBuyer from "@/components/dashboard/RecentOrdersBuyer";
 import RecentOrdersGardener from "@/components/dashboard/RecentOrdersGardener";
 import Image from 'next/image';
-import styles from '@/styles/Modal.module.css'; // Import custom styles
+import styles from '@/styles/Modal.module.css';
+import Head from "next/head"; // Import custom styles
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -86,6 +87,15 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-gray-100">
+            <Head>
+                <title>Sprout Connections - Dashboard</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <header className="bg-primary text-white p-4">
                 <h1 className="text-3xl">Dashboard</h1>
                 {user && <p className="mt-2">Welcome, {user.firstName || user.username}</p>}

@@ -1,52 +1,60 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useUser } from '@/contexts/UserContext';
+import Head from "next/head";
 
 export default function Profile() {
-    const [user, setUser] = useState(null);
+    const { user, setUser, fetchUser } = useUser();
     const [username, setUsername] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [isGardener, setIsGardener] = useState(false);
+    const [postcode, setPostcode] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
-    const [postcode, setPostcode] = useState('');
     const router = useRouter();
 
     useEffect(() => {
-        async function fetchUser() {
-            const res = await fetch('/api/auth/me');
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data.user);
-                setUsername(data.user.username);
-                setFirstName(data.user.firstName);
-                setLastName(data.user.lastName);
-                setEmail(data.user.email);
-                setPostcode(data.user.postcode)
-                setIsGardener(data.user.isGardener);
-            } else {
-                router.push('/login');
-            }
+        if (user) {
+            setUsername(user.username);
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setEmail(user.email);
+            setPostcode(user.postcode);
+            setIsGardener(user.isGardener);
         }
-
-        fetchUser();
-    }, [router]);
+    }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let latitude = null;
+        let longitude = null;
+        if (postcode) {
+            const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+            const data = await response.json();
+            if (data.status === 200) {
+                latitude = data.result.latitude;
+                longitude = data.result.longitude;
+            } else {
+                setError('Invalid postcode');
+                return;
+            }
+        }
 
         const res = await fetch('/api/auth/profile', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, firstName, lastName, email, isGardener, postcode }),
+            body: JSON.stringify({ username, firstName, lastName, email, isGardener, postcode, latitude, longitude }),
         });
 
         if (res.ok) {
             setSuccess('Profile updated successfully');
             setError(null);
+            fetchUser(); // Refresh user data
         } else {
             const result = await res.json();
             setError(result.message || 'Failed to update profile');
@@ -60,6 +68,15 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <Head>
+                <title>Sprout Connections - Profile</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Profile</h1>
                 <form onSubmit={handleSubmit}>
@@ -106,7 +123,11 @@ export default function Profile() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="postcode" className="block text-gray-700 mb-2">Postcode</label>
+                        <label htmlFor="postcode" className="block text-gray-700 mb-2">
+                            Postcode
+                            {!isGardener &&
+                                <span className="block text-sm text-gray-600 mt-1">Set your postcode as default in the search bar</span>}
+                        </label>
                         <input
                             id="postcode"
                             type="text"
@@ -115,7 +136,7 @@ export default function Profile() {
                             onChange={(e) => setPostcode(e.target.value)}
                         />
                     </div>
-                    <div className="mb-4 flex items-center">
+                    <div className="mb-4 hidden">
                         <input
                             id="isGardener"
                             type="checkbox"

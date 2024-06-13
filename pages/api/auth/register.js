@@ -5,28 +5,33 @@ import bcrypt from 'bcryptjs';
 import { signToken } from '@/lib/jwt';
 import cookie from 'cookie';
 import stripe from '@/lib/stripe';
+import axios from "axios";
 
 export default async function handler(req, res) {
+    // Only allow POST requests
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
+    // Destructure the request body to get user details
     const { username, email, password, isGardener, firstName, lastName, dob, address, city, postalCode, state, country, phone } = req.body;
 
+    // Check if required fields are provided
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
     try {
+        // Connect to the database
         await connectToDatabase();
 
+        // Check if a user with the given email already exists
         const existingUser = await User.findOne({ email });
-
         if (existingUser) {
             return res.status(409).json({ error: 'User already exists' });
         }
 
-        // Fetch latitude and longitude from postcodes.io
+        // Fetch latitude and longitude from postcodes.io if postalCode is provided
         let latitude = null;
         let longitude = null;
         if (postalCode) {
@@ -40,8 +45,10 @@ export default async function handler(req, res) {
             }
         }
 
+        // Hash the user's password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Create a new user document
         const user = await User.create({
             username,
             email,
@@ -55,8 +62,10 @@ export default async function handler(req, res) {
             termsAcceptedDate: new Date()
         });
 
+        // Sign a JWT token for the user
         const token = await signToken({ userId: user._id });
 
+        // Set a cookie with the JWT token
         res.setHeader('Set-Cookie', cookie.serialize('token', token, {
             httpOnly: true,
             secure: true, // Should be true in production
@@ -65,7 +74,51 @@ export default async function handler(req, res) {
             path: '/'
         }));
 
+        // Brevo API call to add user to list
+        const brevoAddUserToList = async (email, firstName, listIds) => {
+            try {
+                // Check if the user already exists
+                const { data: existingContact } = await axios.get(`https://api.sendinblue.com/v3/contacts/${email}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'api-key': process.env.SENDINBLUE_API_KEY
+                    }
+                });
+
+                if (existingContact) {
+                    // If the user exists, update their contact to add them to the new list(s)
+                    await axios.put(`https://api.sendinblue.com/v3/contacts/${email}`, {
+                        listIds: [...new Set([...existingContact.listIds, ...listIds])]
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': process.env.SENDINBLUE_API_KEY
+                        }
+                    });
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    // If the user does not exist, create a new contact
+                    await axios.post('https://api.sendinblue.com/v3/contacts', {
+                        email: email,
+                        attributes: {
+                            FIRSTNAME: firstName,
+                        },
+                        listIds: listIds
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': process.env.SENDINBLUE_API_KEY
+                        }
+                    });
+                } else {
+                    console.error('Error adding/updating user in Brevo list:', error.response ? error.response.data : error.message);
+                }
+            }
+        };
+
         if (isGardener) {
+            // If the user is a gardener, format the phone number and create a Stripe account
             const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
 
             const account = await stripe.accounts.create({
@@ -104,9 +157,11 @@ export default async function handler(req, res) {
                 },
             });
 
+            // Save the Stripe account ID in the user's document
             user.stripeAccountId = account.id;
             await user.save();
 
+            // Create a Stripe account link for onboarding
             const accountLink = await stripe.accountLinks.create({
                 account: account.id,
                 refresh_url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/register/stripe-setup?userId=${user._id}`,
@@ -114,12 +169,19 @@ export default async function handler(req, res) {
                 type: 'account_onboarding',
             });
 
+            // Add user to the gardener list in Brevo
+            await brevoAddUserToList(email, firstName, [10, 12]);
+
+            // Respond with the account onboarding URL
             return res.status(200).json({ url: accountLink.url });
         } else {
+            // Add user to the non-gardener list in Brevo
+            await brevoAddUserToList(email, firstName, [10, 11]);
+            // If the user is not a gardener, simply respond with a success message
             return res.status(201).json({ message: 'User created', userId: user._id });
         }
     } catch (error) {
-        console.error('Error creating Stripe account:', error);
+        console.error('Error creating user or Stripe account:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }

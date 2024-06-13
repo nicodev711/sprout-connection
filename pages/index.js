@@ -1,6 +1,7 @@
 import JoinCommunity from '@/components/JoinCommunity';
 import Head from 'next/head';
 import keywords from '@/utils/keywords';
+import Link from "next/link";
 
 export default function Home() {
     const combinedKeywords = [...new Set([...keywords.buyers, ...keywords.sellers])].join(', ');
@@ -8,7 +9,7 @@ export default function Home() {
     return (
         <div className="bg-background text-text min-h-screen">
             <Head>
-                <title>Sprout Connections - Fresh Garden Produce from Your Neighbors</title>
+                <title>Sprout Connections - Fresh Garden Produce from Your Neighbours</title>
                 <meta name="description"
                       content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
                 <meta name="keywords" content={combinedKeywords}/>
@@ -26,7 +27,7 @@ export default function Home() {
                         <p className="mb-5 text-lg text-white sm:text-xl">
                             Buy and sell fresh, locally-grown produce directly from gardeners in your community.
                         </p>
-                        <button className="btn btn-accent text-md sm:text-lg px-6 py-3">Get Started</button>
+                        <Link href={'/register'} className="btn btn-accent text-md sm:text-lg px-6 py-3">Get Started</Link>
                     </div>
                 </div>
             </div>

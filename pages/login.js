@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
 import Link from "next/link";
+import Head from "next/head";
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -34,6 +35,15 @@ export default function Login() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <Head>
+                <title>Sprout Connections - Login</title>
+                <meta name="description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
+                <meta property="og:description"
+                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
+                <meta property="og:url" content="https://www.sproutconnections.com"/>
+            </Head>
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Login</h1>
                 <form onSubmit={handleSubmit}>
