@@ -30,12 +30,17 @@ export default function StripeDetailsForm({ prevStep, handleChange, userData, ha
 
     const handlePhoneChange = (e) => {
         let value = e.target.value;
-        if (value.startsWith('0')) {
+
+        // Validate phone number to ensure it doesn't start with letters, symbols, or 0
+        if (!/^\d+$/.test(value)) {
+            setPhoneError('Phone number should only contain digits');
+        } else if (value.startsWith('0')) {
             setPhoneError('Phone number should not start with 0');
         } else {
             setPhoneError('');
             value = '+44' + value; // Ensure the phone number starts with +44
         }
+
         handleChange('phone')({ target: { value } });
     };
 
