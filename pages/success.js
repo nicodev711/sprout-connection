@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
+import Head from "next/head";
 
 
 const Success = () => {
