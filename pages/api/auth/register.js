@@ -170,13 +170,13 @@ export default async function handler(req, res) {
             });
 
             // Add user to the gardener list in Brevo
-            await brevoAddUserToList(email, firstName, [10, 12]);
+            await brevoAddUserToList(email, username, [10, 12]);
 
             // Respond with the account onboarding URL
             return res.status(200).json({ url: accountLink.url });
         } else {
             // Add user to the non-gardener list in Brevo
-            await brevoAddUserToList(email, firstName, [10, 11]);
+            await brevoAddUserToList(email, username, [10, 11]);
             // If the user is not a gardener, simply respond with a success message
             return res.status(201).json({ message: 'User created', userId: user._id });
         }
