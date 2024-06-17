@@ -17,8 +17,6 @@ const checkoutHandler = async (req, res) => {
             return res.status(400).json({ error: 'Cart is empty' });
         }
 
-        console.log('Received cart:', cart);
-
         const gardenerIds = [...new Set(cart.map(item => item.userId.toString()))];
 
         if (gardenerIds.length === 0) {
@@ -32,11 +30,11 @@ const checkoutHandler = async (req, res) => {
                 currency: 'gbp',
                 product_data: {
                     name: item.title,
-                    description: `£${item.price.toFixed(2)} per ${item.units} (Qty: ${item.quantity})`,
+                    description: `£${item.price.toFixed(2)} per ${item.units} (Total Qty: ${item.quantity})`,
                 },
-                unit_amount: Math.round((item.price / factor) * 100), // Adjusted price in pence
+                unit_amount: Math.round(item.price * item.quantity * 100), // Adjusted total price in pence
             },
-            quantity: Math.round(item.quantity * factor), // Adjusted quantity as integer
+            quantity: 1, // Always set quantity to 1
         }));
 
         const totalProductAmount = cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
