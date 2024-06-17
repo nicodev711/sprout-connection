@@ -6,7 +6,21 @@ import Footer from "@/components/Footer";
 import Head from 'next/head';
 import Script from "next/script";
 import keywords from '@/utils/keywords';
+import { CartProvider, useCart } from '@/contexts/CartContext';
+import { useEffect } from 'react';
 
+const CartInitializer = ({ children }) => {
+    const { dispatch } = useCart();
+
+    useEffect(() => {
+        const cartData = localStorage.getItem('cart');
+        if (cartData) {
+            dispatch({ type: 'INITIALIZE_CART', payload: JSON.parse(cartData) });
+        }
+    }, [dispatch]);
+
+    return children;
+};
 
 export default function MyApp({ Component, pageProps }) {
     return (
@@ -34,9 +48,13 @@ export default function MyApp({ Component, pageProps }) {
                 </script>
             </Head>
             <UserProvider>
-                <Navbar />
-                <Component {...pageProps} />
-                <Footer />
+                <CartProvider>
+                    <CartInitializer>
+                        <Navbar />
+                        <Component {...pageProps} />
+                        <Footer />
+                    </CartInitializer>
+                </CartProvider>
             </UserProvider>
             <Script async src="https://www.googletagmanager.com/gtag/js?id=G-QCFYDDKPC2" />
             <Script id="googleAnalytics">
