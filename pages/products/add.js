@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function CreateProduct({ token }) {
     const [title, setTitle] = useState('');
@@ -10,6 +11,7 @@ export default function CreateProduct({ token }) {
     const [image, setImage] = useState(null);
     const [imageCDNLink, setImageCDNLink] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleImageUpload = async (file) => {
         const reader = new FileReader();
@@ -56,6 +58,7 @@ export default function CreateProduct({ token }) {
                 setImage(null);
                 setImageCDNLink('');
                 alert('Product created successfully!');
+                router.push('/dashboard');
             } else {
                 const errorData = await response.json();
                 alert(`Failed to create product: ${errorData.error || 'Unknown error'}`);
