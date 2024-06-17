@@ -8,7 +8,7 @@ export default function CreateProduct({ token }) {
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('Vegetables');
     const [image, setImage] = useState(null);
-    const [imageCDNLink, setImageCDNLink] = useState('https://res.cloudinary.com/dyglfoum8/image/upload/v1718614120/sproutConnection/product_od67nq.jpg');
+    const [imageCDNLink, setImageCDNLink] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleImageUpload = async (file) => {

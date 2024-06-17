@@ -28,7 +28,7 @@ const indexHandler = async (req, res) => {
                 units,
                 price,
                 category,
-                imageCDNLink: imageCDNLink || '', // Ensure this can be empty or null
+                imageCDNLink: imageCDNLink || 'https://res.cloudinary.com/dyglfoum8/image/upload/v1718614120/sproutConnection/product_od67nq.jpg', // Ensure this can be empty or null
                 isListed: true,
                 isDelivered: false,
                 postcode: user.postcode,       // Attach user's postcode
