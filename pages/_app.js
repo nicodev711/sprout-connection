@@ -1,24 +1,14 @@
-import "@/styles/globals.css";
-import Navbar from "@/components/Navbar";
-import { UserProvider } from "@/contexts/UserContext";
+import '@/styles/globals.css';
+import Navbar from '@/components/Navbar';
+import { UserProvider } from '@/contexts/UserContext';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Footer from "@/components/Footer";
+import Footer from '@/components/Footer';
 import Head from 'next/head';
-import Script from "next/script";
+import Script from 'next/script';
 import keywords from '@/utils/keywords';
-import { CartProvider, useCart } from '@/contexts/CartContext';
-import { useEffect } from 'react';
+import { CartProvider } from '@/contexts/CartContext';
 
 const CartInitializer = ({ children }) => {
-    const { dispatch } = useCart();
-
-    useEffect(() => {
-        const cartData = localStorage.getItem('cart');
-        if (cartData) {
-            dispatch({ type: 'INITIALIZE_CART', payload: JSON.parse(cartData) });
-        }
-    }, [dispatch]);
-
     return children;
 };
 

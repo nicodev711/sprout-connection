@@ -1,9 +1,7 @@
-// components/Product.js
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
-import { useUser } from '@/contexts/UserContext';
 import Head from 'next/head';
 import keywords from '@/utils/keywords';
 import { useCart } from '@/contexts/CartContext';
@@ -13,7 +11,7 @@ export default function ProductDetails() {
     const { id } = router.query;
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const { state, dispatch } = useCart();
+    const { dispatch } = useCart();
 
     useEffect(() => {
         if (id) {
@@ -33,12 +31,27 @@ export default function ProductDetails() {
     if (!product) return <p>Loading...</p>;
 
     const handleAddToBasket = () => {
-        const cartItem = { ...product, quantity };
+        const cartItem = {
+            _id: product._id,
+            title: product.title,
+            description: product.description,
+            userId: product.userId,
+            quantity: quantity,
+            units: product.units,
+            price: product.price,
+            category: product.category,
+            isListed: product.isListed,
+            isDelivered: product.isDelivered,
+            imageCDNLink: product.imageCDNLink,
+            postcode: product.postcode,
+            latitude: product.latitude,
+            longitude: product.longitude,
+            createdAt: product.createdAt,
+            modifiedAt: product.modifiedAt
+        };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
-        //alert(`Added ${quantity} ${product.units} of ${product.title} to the basket!`);
     };
 
-    // Generate a list of keywords for this specific product page
     const productKeywords = [
         ...keywords.buyers,
         `fresh produce, buy ${product.title}, garden produce, local produce, ${product.title} for sale`
@@ -63,7 +76,7 @@ export default function ProductDetails() {
                       "name": "${product.title}",
                       "image": "${product.imageCDNLink}",
                       "description": "${product.description}",
-                      "sku": "${product.id}",
+                      "sku": "${product._id}",
                       "offers": {
                         "@type": "Offer",
                         "url": "https://www.sproutconnections.com/products/${id}",
@@ -113,7 +126,7 @@ export default function ProductDetails() {
                                 min="0.1"
                                 step="0.1"
                                 max={product.quantity}
-                                onChange={(e) => setQuantity(Number(e.target.value))}
+                                onChange={(e) => setQuantity(Math.min(Number(e.target.value), product.quantity))}
                             />
                         </div>
                         <button

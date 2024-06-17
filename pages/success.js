@@ -2,25 +2,24 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUser } from '@/contexts/UserContext';
-import Head from "next/head";
-
+import Head from 'next/head';
 
 const Success = () => {
     const { clearBasket } = useUser();
     const router = useRouter();
 
     useEffect(() => {
-        // Clear the basket when this page is loaded
-        clearBasket();
+        // Clear the basket from localStorage when this page is loaded
+        localStorage.removeItem('cart');
 
         // Redirect to dashboard after a short delay
         const timer = setTimeout(() => {
-            router.push('/dashboard');
+            router.replace('/dashboard');
         }, 5000); // 5 seconds delay
 
         // Cleanup the timer on component unmount
         return () => clearTimeout(timer);
-    }, [clearBasket, router]);
+    }, [router]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
@@ -37,10 +36,8 @@ const Success = () => {
                 <h1 className="text-2xl font-bold mb-6 text-green-600">Payment Successful!</h1>
                 <p className="text-lg mb-4">Thank you for your purchase. Your order will be processed shortly.</p>
                 <p className="text-lg mb-4">You will be redirected to your dashboard shortly.</p>
-                <Link href='/dashboard'>
-                    <a className="btn btn-primary px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600 transition duration-300">
-                        Back to Dashboard
-                    </a>
+                <Link href='/dashboard' className="btn btn-primary px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600 transition duration-300">
+                    Back to Dashboard
                 </Link>
             </div>
         </div>

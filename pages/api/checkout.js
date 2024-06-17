@@ -8,33 +8,38 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const checkoutHandler = async (req, res) => {
     await dbConnect();
     const userId = req.user.userId;
-    const { cart } = req.body;
 
     try {
+        const { cart } = req.body;
+
         if (!cart || cart.length === 0) {
             console.error('Cart is empty or not provided');
             return res.status(400).json({ error: 'Cart is empty' });
         }
 
-        const gardenerIds = [...new Set(cart.map(item => item.productId.userId.toString()))];
+        console.log('Received cart:', cart);
+
+        const gardenerIds = [...new Set(cart.map(item => item.userId.toString()))];
 
         if (gardenerIds.length === 0) {
             console.error('No gardener IDs found');
             return res.status(400).json({ error: 'No gardener IDs found' });
         }
 
+        const factor = 10; // Factor to convert quantity to integer
         const lineItems = cart.map(item => ({
             price_data: {
                 currency: 'gbp',
                 product_data: {
-                    name: item.productId.title,
+                    name: item.title,
+                    description: `£${item.price.toFixed(2)} per ${item.units} (Qty: ${item.quantity})`,
                 },
-                unit_amount: Math.round(item.productId.price * 100), // price in pence
+                unit_amount: Math.round((item.price / factor) * 100), // Adjusted price in pence
             },
-            quantity: item.quantity,
+            quantity: Math.round(item.quantity * factor), // Adjusted quantity as integer
         }));
 
-        const totalProductAmount = cart.reduce((total, item) => total + (item.productId.price * item.quantity), 0).toFixed(2);
+        const totalProductAmount = cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
         const serviceFee = (totalProductAmount * 0.1).toFixed(2);
         const smallOrderFee = totalProductAmount < 5 ? 0.30 : 0;
         const total = (parseFloat(totalProductAmount) + parseFloat(serviceFee) + parseFloat(smallOrderFee)).toFixed(2);
@@ -80,6 +85,10 @@ const checkoutHandler = async (req, res) => {
             mode: 'payment',
             success_url: `${req.headers.origin}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${req.headers.origin}/cancel`,
+            metadata: {
+                userId: userId,
+                cart: JSON.stringify(cart), // Include cart data as metadata
+            },
             payment_intent_data: {
                 application_fee_amount: Math.round((parseFloat(serviceFee) + parseFloat(smallOrderFee)) * 100), // Platform fee in pence
                 transfer_data: {

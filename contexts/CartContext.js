@@ -1,42 +1,86 @@
-// context/CartContext.js
-import { createContext, useReducer, useContext, useEffect } from 'react';
+import React, { createContext, useReducer, useContext, useEffect } from 'react';
+import { signToken, verifyToken } from '@/lib/jwt';
 
 const CartContext = createContext();
 
-// context/CartContext.js
 const cartReducer = (state, action) => {
     switch (action.type) {
         case 'ADD_ITEM':
-            const updatedStateAdd = { ...state, items: [...state.items, action.payload] };
-            localStorage.setItem('cart', JSON.stringify(updatedStateAdd));
-            return updatedStateAdd;
+            const updatedCart = [...state.items, action.payload];
+            signAndStoreCart(updatedCart);
+            return { items: updatedCart };
         case 'REMOVE_ITEM':
-            const updatedStateRemove = { ...state, items: state.items.filter(item => item._id !== action.payload) };
-            localStorage.setItem('cart', JSON.stringify(updatedStateRemove));
-            return updatedStateRemove;
-        case 'CLEAR_CART':
-            localStorage.setItem('cart', JSON.stringify({ items: [] }));
-            return { ...state, items: [] };
+            const filteredCart = state.items.filter(item => item._id !== action.payload);
+            signAndStoreCart(filteredCart);
+            return { items: filteredCart };
         case 'UPDATE_ITEM_QUANTITY':
-            const { productId, quantity } = action.payload;
             const updatedItems = state.items.map(item =>
-                item._id === productId ? { ...item, quantity } : item
+                item._id === action.payload.productId
+                    ? { ...item, quantity: action.payload.quantity }
+                    : item
             );
-            const updatedStateQuantity = { ...state, items: updatedItems };
-            localStorage.setItem('cart', JSON.stringify(updatedStateQuantity));
-            return updatedStateQuantity;
+            signAndStoreCart(updatedItems);
+            return { items: updatedItems };
         case 'INITIALIZE_CART':
-            return action.payload;
+            return { items: action.payload };
         default:
             return state;
     }
 };
 
+const signAndStoreCart = async (cart) => {
+    const token = await signToken({ items: cart });
+    localStorage.setItem('cart', token);
+};
+
 export const CartProvider = ({ children }) => {
     const [state, dispatch] = useReducer(cartReducer, { items: [] });
 
+    useEffect(() => {
+        const initializeCart = async () => {
+            const token = localStorage.getItem('cart');
+            if (token) {
+                try {
+                    const decodedCart = await verifyToken(token);
+                    if (decodedCart) {
+                        dispatch({ type: 'INITIALIZE_CART', payload: decodedCart.items });
+                    }
+                } catch (error) {
+                    console.error('Invalid or expired cart token', error);
+                }
+            }
+        };
+
+        initializeCart();
+    }, []);
+
+    const signAndStoreCart = async (cart) => {
+        const token = await signToken({ items: cart });
+        localStorage.setItem('cart', token);
+    };
+
+    const addItemToCart = (item) => {
+        const updatedCart = [...state.items, item];
+        signAndStoreCart(updatedCart);
+        dispatch({ type: 'ADD_ITEM', payload: item });
+    };
+
+    const removeItemFromCart = (productId) => {
+        const updatedCart = state.items.filter(item => item._id !== productId);
+        signAndStoreCart(updatedCart);
+        dispatch({ type: 'REMOVE_ITEM', payload: productId });
+    };
+
+    const updateItemQuantity = (productId, quantity) => {
+        const updatedItems = state.items.map(item =>
+            item._id === productId ? { ...item, quantity } : item
+        );
+        signAndStoreCart(updatedItems);
+        dispatch({ type: 'UPDATE_ITEM_QUANTITY', payload: { productId, quantity } });
+    };
+
     return (
-        <CartContext.Provider value={{ state, dispatch }}>
+        <CartContext.Provider value={{ state, dispatch, addItemToCart, removeItemFromCart, updateItemQuantity }}>
             {children}
         </CartContext.Provider>
     );

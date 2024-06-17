@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 
 const Basket = () => {
-    const { state, dispatch } = useCart();
+    const { state, updateItemQuantity, removeItemFromCart } = useCart();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
@@ -29,19 +29,6 @@ const Basket = () => {
         }, 0);
     };
 
-    const handleQuantityChange = (productId, quantity) => {
-        dispatch({ type: 'UPDATE_ITEM_QUANTITY', payload: { productId, quantity: parseFloat(quantity) } });
-    };
-
-    const handleRemoveItem = (productId) => {
-        dispatch({ type: 'REMOVE_ITEM', payload: productId });
-    };
-
-    const totalAmount = calculateTotal();
-    const serviceFee = totalAmount * 0.1;
-    const smallOrderFee = totalAmount < 5 ? 0.30 : 0;
-    const finalAmount = totalAmount + serviceFee + smallOrderFee;
-
     const handleCheckout = async () => {
         try {
             const { data } = await axios.post('/api/checkout', { cart: state.items }, { withCredentials: true });
@@ -52,6 +39,7 @@ const Basket = () => {
             console.error('Failed to redirect to Stripe checkout:', error);
         }
     };
+
 
     if (loading) {
         return (
@@ -77,7 +65,7 @@ const Basket = () => {
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
             <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-green-600">Basket</h1>
-                {totalAmount > 0 && totalAmount < 5 && (
+                {calculateTotal() > 0 && calculateTotal() < 5 && (
                     <div className="toast mb-4">
                         <div className="alert alert-info">
                             <span>Your basket total is below £5. Add more items to avoid an extra £0.30 fee.</span>
@@ -99,7 +87,7 @@ const Basket = () => {
                                             step="0.1"
                                             id={`quantity-${index}`}
                                             value={item.quantity}
-                                            onChange={(e) => handleQuantityChange(item._id, e.target.value)}
+                                            onChange={(e) => updateItemQuantity(item._id, e.target.value)}
                                             min="0.1"
                                             className="w-16 p-1 border rounded"
                                         />
@@ -108,7 +96,7 @@ const Basket = () => {
                                 <div className="flex flex-col items-end">
                                     <p className="text-sm font-semibold">Total: £{(item.price * item.quantity).toFixed(2)}</p>
                                     <button
-                                        onClick={() => handleRemoveItem(item._id)}
+                                        onClick={() => removeItemFromCart(item._id)}
                                         className="ml-4 text-red-500 hover:underline mt-2"
                                     >
                                         Remove
@@ -125,21 +113,21 @@ const Basket = () => {
                         <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm">
                             <div className="flex justify-between items-center mb-2">
                                 <p className="text-lg font-semibold">Total Amount</p>
-                                <p className="text-lg font-bold text-gray-800">£{totalAmount.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-800">£{calculateTotal().toFixed(2)}</p>
                             </div>
                             <div className="flex justify-between items-center mb-2">
                                 <p className="text-lg font-semibold">Service Fee</p>
-                                <p className="text-lg font-bold text-gray-800">£{serviceFee.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-800">£{(calculateTotal() * 0.1).toFixed(2)}</p>
                             </div>
-                            {smallOrderFee > 0 && (
+                            {calculateTotal() < 5 && (
                                 <div className="flex justify-between items-center mb-2">
                                     <p className="text-lg font-semibold">Small Order Fee</p>
-                                    <p className="text-lg font-bold text-gray-800">£{smallOrderFee.toFixed(2)}</p>
+                                    <p className="text-lg font-bold text-gray-800">£0.30</p>
                                 </div>
                             )}
                             <div className="flex justify-between items-center border-t pt-2">
                                 <p className="text-lg font-semibold">Final Amount</p>
-                                <p className="text-lg font-bold text-gray-800">£{finalAmount.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-800">£{(calculateTotal() + (calculateTotal() * 0.1) + (calculateTotal() < 5 ? 0.30 : 0)).toFixed(2)}</p>
                             </div>
                         </div>
                         <div className="mt-6 flex justify-center">
