@@ -47,7 +47,8 @@ export default function ProductDetails() {
             latitude: product.latitude,
             longitude: product.longitude,
             createdAt: product.createdAt,
-            modifiedAt: product.modifiedAt
+            modifiedAt: product.modifiedAt,
+            unitType: product.unitType // Ensure unitType is included
         };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
     };
@@ -123,10 +124,17 @@ export default function ProductDetails() {
                                 id="quantity"
                                 className="input input-bordered w-full"
                                 value={quantity}
-                                min="0.1"
-                                step="0.1"
+                                min={product.unitType === 'integer' ? '1' : '0.1'}
+                                step={product.unitType === 'integer' ? '1' : '0.1'}
                                 max={product.quantity}
-                                onChange={(e) => setQuantity(Math.min(Number(e.target.value), product.quantity))}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (product.unitType === 'integer' && !Number.isInteger(parseFloat(value))) {
+                                        alert('This product can only be purchased in whole units.');
+                                    } else {
+                                        setQuantity(Math.min(Number(value), product.quantity));
+                                    }
+                                }}
                             />
                         </div>
                         <button

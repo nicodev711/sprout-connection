@@ -39,6 +39,12 @@ const ProductSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    unitType: {
+        type: String,
+        enum: ['integer', 'decimal'],
+        required: true,
+        default: 'integer', // Default unitType to 'integer'
+    },
     createdAt: {
         type: Date,
         default: Date.now,

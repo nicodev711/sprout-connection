@@ -47,6 +47,17 @@ const Basket = () => {
         }
     };
 
+    const handleQuantityChange = (productId, quantity, unitType) => {
+        console.log(`handleQuantityChange called with productId: ${productId}, quantity: ${quantity}, unitType: ${unitType}`);
+        if (unitType === 'integer' && !Number.isInteger(parseFloat(quantity))) {
+            console.log(`Invalid quantity for integer unitType: ${quantity}`);
+            alert('This product can only be purchased in whole units.');
+            return;
+        }
+        console.log(`Updating quantity to: ${quantity}`);
+        updateItemQuantity(productId, quantity, unitType);
+    };
+
     if (!user) {
         return null; // Return null while redirecting to login
     }
@@ -92,11 +103,11 @@ const Basket = () => {
                                         <label htmlFor={`quantity-${index}`} className="mr-2">Quantity:</label>
                                         <input
                                             type="number"
-                                            step="0.1"
+                                            step={item.unitType === 'integer' ? '1' : '0.1'}
                                             id={`quantity-${index}`}
                                             value={item.quantity}
-                                            onChange={(e) => updateItemQuantity(item._id, e.target.value)}
-                                            min="0.1"
+                                            onChange={(e) => handleQuantityChange(item._id, e.target.value, item.unitType)}
+                                            min={item.unitType === 'integer' ? '1' : '0.1'}
                                             className="w-16 p-1 border rounded"
                                         />
                                     </div>

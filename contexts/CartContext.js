@@ -1,3 +1,4 @@
+// CartContext.js
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import { signToken, verifyToken } from '@/lib/jwt';
 
@@ -54,11 +55,6 @@ export const CartProvider = ({ children }) => {
         initializeCart();
     }, []);
 
-    const signAndStoreCart = async (cart) => {
-        const token = await signToken({ items: cart });
-        localStorage.setItem('cart', token);
-    };
-
     const addItemToCart = (item) => {
         const updatedCart = [...state.items, item];
         signAndStoreCart(updatedCart);
@@ -71,7 +67,11 @@ export const CartProvider = ({ children }) => {
         dispatch({ type: 'REMOVE_ITEM', payload: productId });
     };
 
-    const updateItemQuantity = (productId, quantity) => {
+    const updateItemQuantity = (productId, quantity, unitType) => {
+        if (unitType === 'integer' && !Number.isInteger(parseFloat(quantity))) {
+            alert('This product can only be purchased in whole units.');
+            return;
+        }
         const updatedItems = state.items.map(item =>
             item._id === productId ? { ...item, quantity } : item
         );
