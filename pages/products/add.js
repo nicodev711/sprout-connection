@@ -180,7 +180,7 @@ export default function CreateProduct({ token }) {
                             />
                             <label htmlFor="decimal">Yes, fractional units are allowed</label>
                         </div>
-                        <p className="text-gray-500 text-sm mt-2">Select "No" if your product can only be sold in whole units (e.g., pieces, packs). Select "Yes" if your product can be sold in fractional quantities (e.g., weight, volume).</p>
+                        <p className="text-gray-500 text-sm mt-2">Select &#34;No&#34; if your product can only be sold in whole units (e.g., pieces, packs). Select &#34;Yes&#34; if your product can be sold in fractional quantities (e.g., weight, volume).</p>
                     </div>
                     <button type="submit"
                             className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">
