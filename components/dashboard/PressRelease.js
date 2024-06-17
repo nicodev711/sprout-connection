@@ -8,7 +8,11 @@ export default function PressRelease() {
         const fetchPressReleases = async () => {
             const response = await fetch('/api/press-release');
             const data = await response.json();
-            setPressReleases(data);
+
+            // Sort the press releases by date in descending order
+            const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            setPressReleases(sortedData);
         };
 
         fetchPressReleases();
