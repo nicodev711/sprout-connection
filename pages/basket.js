@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
+import Link from 'next/link';
+import { useUser } from '@/contexts/UserContext';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
+import Head from "next/head";
 
 const Basket = () => {
-    const { state, dispatch } = useCart();
+    const { basket, updateItemQuantity, removeItemFromBasket } = useUser();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (state.items) {
-            console.log("Basket data:", state.items);
+        if (basket) {
+            console.log("Basket data:", basket);
             setLoading(false);
         }
-    }, [state.items]);
+    }, [basket]);
 
     const calculateTotal = () => {
-        if (!state.items || !Array.isArray(state.items)) return 0;
-        return state.items.reduce((total, item) => {
+        if (!basket || !Array.isArray(basket)) return 0;
+        return basket.reduce((total, item) => {
             const price = parseFloat(item.price || 0);
             const quantity = parseFloat(item.quantity);
             if (isNaN(price) || isNaN(quantity)) {
@@ -29,12 +30,14 @@ const Basket = () => {
         }, 0);
     };
 
-    const handleQuantityChange = (productId, quantity) => {
-        dispatch({ type: 'UPDATE_ITEM_QUANTITY', payload: { productId, quantity: parseFloat(quantity) } });
+    const handleQuantityChange = (index, quantity) => {
+        const productId = basket[index].productId;
+        updateItemQuantity(productId, parseFloat(quantity));
     };
 
-    const handleRemoveItem = (productId) => {
-        dispatch({ type: 'REMOVE_ITEM', payload: productId });
+    const handleRemoveItem = (index) => {
+        const productId = basket[index].productId;
+        removeItemFromBasket(productId);
     };
 
     const totalAmount = calculateTotal();
@@ -44,7 +47,7 @@ const Basket = () => {
 
     const handleCheckout = async () => {
         try {
-            const { data } = await axios.post('/api/checkout', { cart: state.items }, { withCredentials: true });
+            const { data } = await axios.post('/api/checkout', {}, { withCredentials: true });
             if (data && data.url) {
                 await router.push(data.url);
             }
@@ -86,8 +89,8 @@ const Basket = () => {
                 )}
 
                 <ul className="space-y-4">
-                    {state.items.length > 0 ? (
-                        state.items.map((item, index) => (
+                    {basket.length > 0 ? (
+                        basket.map((item, index) => (
                             <li key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
                                 <div>
                                     <h2 className="text-lg font-semibold">{item.title}</h2>
@@ -99,8 +102,8 @@ const Basket = () => {
                                             step="0.1"
                                             id={`quantity-${index}`}
                                             value={item.quantity}
-                                            onChange={(e) => handleQuantityChange(item._id, e.target.value)}
-                                            min="0.1"
+                                            onChange={(e) => handleQuantityChange(index, e.target.value)}
+                                            min="1"
                                             className="w-16 p-1 border rounded"
                                         />
                                     </div>
@@ -108,7 +111,7 @@ const Basket = () => {
                                 <div className="flex flex-col items-end">
                                     <p className="text-sm font-semibold">Total: £{(item.price * item.quantity).toFixed(2)}</p>
                                     <button
-                                        onClick={() => handleRemoveItem(item._id)}
+                                        onClick={() => handleRemoveItem(index)}
                                         className="ml-4 text-red-500 hover:underline mt-2"
                                     >
                                         Remove
@@ -120,7 +123,7 @@ const Basket = () => {
                         <p className="text-center text-gray-500">Your basket is empty</p>
                     )}
                 </ul>
-                {state.items.length > 0 && (
+                {basket.length > 0 && (
                     <>
                         <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm">
                             <div className="flex justify-between items-center mb-2">

@@ -4,19 +4,25 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
+import EventBus from "@/utils/eventBus";
 import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const { user, logout } = useUser();
-    const { state } = useCart(); // Get the cart state
     const router = useRouter();
     const [basketCount, setBasketCount] = useState(0);
 
     useEffect(() => {
-        // Update basket count whenever cart state changes
-        setBasketCount(state.items.length);
-    }, [state.items]);
+        const updateBasketCount = (count) => {
+            setBasketCount(count);
+        };
+
+        EventBus.on('basketUpdated', updateBasketCount);
+
+        return () => {
+            EventBus.remove('basketUpdated', updateBasketCount);
+        };
+    }, []);
 
     return (
         <div className="navbar bg-base-100">
@@ -91,9 +97,7 @@ const Navbar = () => {
                                     <circle cx="20" cy="21" r="1" />
                                     <path d="M1 1h4l2.68 13.39a1 1 0 0 0 .76.61l12.69.88a1 1 0 0 0 1-.77l1.24-7.45a1 1 0 0 0-.93-1.18L5.31 2H1z" />
                                 </svg>
-                                {basketCount > 0 && (
-                                    <span className="badge badge-sm indicator-item">{basketCount}</span>
-                                )}
+                                <span className="badge badge-sm indicator-item">0</span>
                             </div>
                         </button>
                     </Link>
