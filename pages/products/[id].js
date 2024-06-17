@@ -97,7 +97,7 @@ export default function ProductDetails() {
                 <div className="flex flex-col lg:flex-row lg:space-x-8">
                     <div className="lg:w-1/2">
                         <Image
-                            src={product.imageCDNLink}
+                            src={product.imageCDNLink && product.imageCDNLink.trim() !== '' ? product.imageCDNLink : '/product.png'}
                             alt={product.title}
                             width={500}
                             height={500}

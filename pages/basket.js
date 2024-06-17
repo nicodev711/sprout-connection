@@ -3,18 +3,25 @@ import { useCart } from '@/contexts/CartContext';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { useUser } from '@/contexts/UserContext';
 
 const Basket = () => {
     const { state, updateItemQuantity, removeItemFromCart } = useCart();
+    const { user } = useUser();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
         if (state.items) {
             console.log("Basket data:", state.items);
             setLoading(false);
         }
-    }, [state.items]);
+    }, [user, state.items, router]);
 
     const calculateTotal = () => {
         if (!state.items || !Array.isArray(state.items)) return 0;
@@ -40,18 +47,19 @@ const Basket = () => {
         }
     };
 
+    if (!user) {
+        return null; // Return null while redirecting to login
+    }
 
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
                 <Head>
                     <title>Sprout Connections - Basket</title>
-                    <meta name="description"
-                          content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                    <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
-                    <meta property="og:description"
-                          content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                    <meta property="og:url" content="https://www.sproutconnections.com"/>
+                    <meta name="description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                    <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors" />
+                    <meta property="og:description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                    <meta property="og:url" content="https://www.sproutconnections.com" />
                 </Head>
                 <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-center">
                     <h1 className="text-2xl font-bold mb-6 text-green-600">Loading your basket...</h1>
