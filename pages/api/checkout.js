@@ -81,8 +81,8 @@ const checkoutHandler = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${req.headers.origin}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${req.headers.origin}/cancel`,
+            success_url: `https://${req.headers.origin}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://${req.headers.origin}/cancel`,
             metadata: {
                 userId: userId,
                 cart: JSON.stringify(cart), // Include cart data as metadata
