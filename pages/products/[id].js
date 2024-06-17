@@ -1,3 +1,4 @@
+// components/Product.js
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -5,13 +6,14 @@ import Image from 'next/image';
 import { useUser } from '@/contexts/UserContext';
 import Head from 'next/head';
 import keywords from '@/utils/keywords';
+import { useCart } from '@/contexts/CartContext';
 
 export default function ProductDetails() {
     const router = useRouter();
     const { id } = router.query;
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const { addToBasket } = useUser();
+    const { state, dispatch } = useCart();
 
     useEffect(() => {
         if (id) {
@@ -31,7 +33,8 @@ export default function ProductDetails() {
     if (!product) return <p>Loading...</p>;
 
     const handleAddToBasket = () => {
-        addToBasket(product, quantity);
+        const cartItem = { ...product, quantity };
+        dispatch({ type: 'ADD_ITEM', payload: cartItem });
         //alert(`Added ${quantity} ${product.units} of ${product.title} to the basket!`);
     };
 
@@ -107,7 +110,8 @@ export default function ProductDetails() {
                                 id="quantity"
                                 className="input input-bordered w-full"
                                 value={quantity}
-                                min="1"
+                                min="0.1"
+                                step="0.1"
                                 max={product.quantity}
                                 onChange={(e) => setQuantity(Number(e.target.value))}
                             />
