@@ -89,6 +89,14 @@ export default function ProductDetails() {
                           "@type": "Organization",
                           "name": "Sprout Connection"
                         }
+                      },
+                      "areaServed": {
+                          "@type": "Place",
+                          "address": {
+                            "@type": "PostalAddress",
+                            "postalCode": "${product.postcode}",
+                            "addressLocality": "${product.latitude}, ${product.longitude}"
+                          }
                       }
                     }
                     `}
