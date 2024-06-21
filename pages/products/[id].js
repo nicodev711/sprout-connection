@@ -5,6 +5,16 @@ import Image from 'next/image';
 import Head from 'next/head';
 import keywords from '@/utils/keywords';
 import { useCart } from '@/contexts/CartContext';
+import {
+    FacebookShareButton,
+    TwitterShareButton,
+    LinkedinShareButton,
+    WhatsappShareButton,
+    FacebookIcon,
+    TwitterIcon,
+    LinkedinIcon,
+    WhatsappIcon
+} from 'react-share';
 
 export default function ProductDetails() {
     const router = useRouter();
@@ -47,7 +57,8 @@ export default function ProductDetails() {
             latitude: product.latitude,
             longitude: product.longitude,
             createdAt: product.createdAt,
-            modifiedAt: product.modifiedAt
+            modifiedAt: product.modifiedAt,
+            unitType: product.unitType // Add this line
         };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
     };
@@ -56,6 +67,8 @@ export default function ProductDetails() {
         ...keywords.buyers,
         `fresh produce, buy ${product.title}, garden produce, local produce, ${product.title} for sale`
     ].join(', ');
+
+    const shareUrl = `https://www.sproutconnections.com/products/${id}`;
 
     return (
         <>
@@ -66,7 +79,7 @@ export default function ProductDetails() {
                 <meta property="og:title" content={product.title} />
                 <meta property="og:description" content={product.description} />
                 <meta property="og:image" content={product.imageCDNLink} />
-                <meta property="og:url" content={`https://www.sproutconnections.com/products/${id}`} />
+                <meta property="og:url" content={shareUrl} />
                 <meta property="og:type" content="product" />
                 <script type="application/ld+json">
                     {`
@@ -79,7 +92,7 @@ export default function ProductDetails() {
                       "sku": "${product._id}",
                       "offers": {
                         "@type": "Offer",
-                        "url": "https://www.sproutconnections.com/products/${id}",
+                        "url": "${shareUrl}",
                         "priceCurrency": "GBP",
                         "price": "${product.price}",
                         "itemCondition": "https://schema.org/NewCondition",
@@ -136,8 +149,23 @@ export default function ProductDetails() {
                             Add to Basket
                         </button>
                         <div className="mt-8">
-                            <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
-                            <p className="italic text-gray-600">No reviews yet. Be the first to review this product!</p>
+                            <h2 className="text-2xl font-semibold mb-4 text-gray-700">Customer Reviews</h2>
+                            <p className={"italic text-gray-600"}>We are currently working on this feature</p>
+                            {/*<p className="italic text-gray-600">No reviews yet. Be the first to review this product!</p>*/}
+                        </div>
+                        <div className="mt-8 flex space-x-4">
+                            <FacebookShareButton url={shareUrl} quote={product.title} hashtag="#SproutConnection">
+                                <FacebookIcon size={40} round />
+                            </FacebookShareButton>
+                            <TwitterShareButton url={shareUrl} title={product.title} hashtags={["SproutConnection"]}>
+                                <TwitterIcon size={40} round />
+                            </TwitterShareButton>
+                            <LinkedinShareButton url={shareUrl} title={product.title} summary={product.description} source="Sprout Connection">
+                                <LinkedinIcon size={40} round />
+                            </LinkedinShareButton>
+                            <WhatsappShareButton url={shareUrl} title={product.title} separator=":: ">
+                                <WhatsappIcon size={40} round />
+                            </WhatsappShareButton>
                         </div>
                     </div>
                 </div>
