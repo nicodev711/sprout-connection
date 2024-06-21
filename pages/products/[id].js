@@ -58,7 +58,11 @@ export default function ProductDetails() {
             longitude: product.longitude,
             createdAt: product.createdAt,
             modifiedAt: product.modifiedAt,
+<<<<<<< HEAD
             unitType: product.unitType // Add this line
+=======
+            unitType: product.unitType // Ensure unitType is included
+>>>>>>> 0931d6c557ae9893fc01c17a560c3e8622e0b34c
         };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
     };
@@ -101,6 +105,14 @@ export default function ProductDetails() {
                           "@type": "Organization",
                           "name": "Sprout Connection"
                         }
+                      },
+                      "areaServed": {
+                          "@type": "Place",
+                          "address": {
+                            "@type": "PostalAddress",
+                            "postalCode": "${product.postcode}",
+                            "addressLocality": "${product.latitude}, ${product.longitude}"
+                          }
                       }
                     }
                     `}
@@ -110,7 +122,7 @@ export default function ProductDetails() {
                 <div className="flex flex-col lg:flex-row lg:space-x-8">
                     <div className="lg:w-1/2">
                         <Image
-                            src={product.imageCDNLink}
+                            src={product.imageCDNLink && product.imageCDNLink.trim() !== '' ? product.imageCDNLink : '/product.png'}
                             alt={product.title}
                             width={500}
                             height={500}
@@ -136,10 +148,17 @@ export default function ProductDetails() {
                                 id="quantity"
                                 className="input input-bordered w-full"
                                 value={quantity}
-                                min="0.1"
-                                step="0.1"
+                                min={product.unitType === 'integer' ? '1' : '0.1'}
+                                step={product.unitType === 'integer' ? '1' : '0.1'}
                                 max={product.quantity}
-                                onChange={(e) => setQuantity(Math.min(Number(e.target.value), product.quantity))}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (product.unitType === 'integer' && !Number.isInteger(parseFloat(value))) {
+                                        alert('This product can only be purchased in whole units.');
+                                    } else {
+                                        setQuantity(Math.min(Number(value), product.quantity));
+                                    }
+                                }}
                             />
                         </div>
                         <button

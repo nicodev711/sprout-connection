@@ -26,12 +26,12 @@ const idHandler = async (req, res) => {
     } else if (req.method === 'PUT' || req.method === 'DELETE') {
         await authMiddleware(req, res, async () => {
             if (req.method === 'PUT') {
-                const { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink } = req.body;
+                const { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink, unitType } = req.body;
 
                 try {
                     const updatedProduct = await Product.findByIdAndUpdate(
                         id,
-                        { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink },
+                        { title, description, quantity, units, price, isListed, isDelivered, imageCDNLink, unitType },
                         { new: true }
                     );
                     res.status(200).json(updatedProduct);

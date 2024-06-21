@@ -7,10 +7,14 @@ const indexHandler = async (req, res) => {
     await connectToDatabase();
 
     if (req.method === 'POST') {
-        const { title, description, quantity, units, price, category, imageCDNLink } = req.body;
+        const { title, description, quantity, units, price, category, imageCDNLink, unitType } = req.body;
 
-        if (!title || !description || !units || !price || !category) {
+        if (!title || !description || !units || !price || !category || !unitType) {
             return res.status(400).json({ error: 'All fields except imageCDNLink are required' });
+        }
+
+        if (!['integer', 'decimal'].includes(unitType)) {
+            return res.status(400).json({ error: 'Invalid unit type. Must be either "integer" or "decimal".' });
         }
 
         try {
@@ -28,12 +32,13 @@ const indexHandler = async (req, res) => {
                 units,
                 price,
                 category,
-                imageCDNLink: imageCDNLink || 'https://res.cloudinary.com/dyglfoum8/image/upload/v1718614120/sproutConnection/product_od67nq.jpg', // Ensure this can be empty or null
+                imageCDNLink: imageCDNLink || '', // Ensure this can be empty or null
                 isListed: true,
                 isDelivered: false,
                 postcode: user.postcode,       // Attach user's postcode
                 latitude: user.latitude,       // Attach user's latitude
-                longitude: user.longitude      // Attach user's longitude
+                longitude: user.longitude,     // Attach user's longitude
+                unitType                      // Add the unit type
             });
 
             await newProduct.save();

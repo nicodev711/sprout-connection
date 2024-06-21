@@ -55,7 +55,7 @@ const SearchPage = () => {
                                 <div className="card card-compact w-64 bg-base-100 shadow-xl m-4">
                                     <figure className="relative h-48 w-full overflow-hidden rounded-lg">
                                         <Image
-                                            src={result.imageCDNLink}
+                                            src={result.imageCDNLink && result.imageCDNLink.trim() !== '' ? result.imageCDNLink : '/product.png'}
                                             alt={result.title}
                                             layout="fill"
                                             objectFit="cover"

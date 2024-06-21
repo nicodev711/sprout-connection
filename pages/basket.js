@@ -3,18 +3,25 @@ import { useCart } from '@/contexts/CartContext';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { useUser } from '@/contexts/UserContext';
 
 const Basket = () => {
     const { state, updateItemQuantity, removeItemFromCart } = useCart();
+    const { user } = useUser();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
         if (state.items) {
             console.log("Basket data:", state.items);
             setLoading(false);
         }
-    }, [state.items]);
+    }, [user, state.items, router]);
 
     const calculateTotal = () => {
         if (!state.items || !Array.isArray(state.items)) return 0;
@@ -40,18 +47,30 @@ const Basket = () => {
         }
     };
 
+    const handleQuantityChange = (productId, quantity, unitType) => {
+        console.log(`handleQuantityChange called with productId: ${productId}, quantity: ${quantity}, unitType: ${unitType}`);
+        if (unitType === 'integer' && !Number.isInteger(parseFloat(quantity))) {
+            console.log(`Invalid quantity for integer unitType: ${quantity}`);
+            alert('This product can only be purchased in whole units.');
+            return;
+        }
+        console.log(`Updating quantity to: ${quantity}`);
+        updateItemQuantity(productId, quantity, unitType);
+    };
+
+    if (!user) {
+        return null; // Return null while redirecting to login
+    }
 
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
                 <Head>
                     <title>Sprout Connections - Basket</title>
-                    <meta name="description"
-                          content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                    <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
-                    <meta property="og:description"
-                          content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                    <meta property="og:url" content="https://www.sproutconnections.com"/>
+                    <meta name="description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                    <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors" />
+                    <meta property="og:description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                    <meta property="og:url" content="https://www.sproutconnections.com" />
                 </Head>
                 <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-center">
                     <h1 className="text-2xl font-bold mb-6 text-green-600">Loading your basket...</h1>
@@ -84,11 +103,11 @@ const Basket = () => {
                                         <label htmlFor={`quantity-${index}`} className="mr-2">Quantity:</label>
                                         <input
                                             type="number"
-                                            step="0.1"
+                                            step={item.unitType === 'integer' ? '1' : '0.1'}
                                             id={`quantity-${index}`}
                                             value={item.quantity}
-                                            onChange={(e) => updateItemQuantity(item._id, e.target.value)}
-                                            min="0.1"
+                                            onChange={(e) => handleQuantityChange(item._id, e.target.value, item.unitType)}
+                                            min={item.unitType === 'integer' ? '1' : '0.1'}
                                             className="w-16 p-1 border rounded"
                                         />
                                     </div>

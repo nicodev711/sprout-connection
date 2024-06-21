@@ -1,10 +1,13 @@
 import AdminPanel from '@/components/dashboard/AdminPanel';
 import Head from "next/head";
+import withAdminAuth from "@/hoc/withAdminAuth";
 
-export default function AdminPage() {
+function AdminPage() {
     return (
         <div>
             <AdminPanel />
         </div>
     );
 }
+
+export default withAdminAuth(AdminPage)

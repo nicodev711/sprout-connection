@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaBan, FaDollarSign } from 'react-icons/fa';
+import withAdminAuth from "@/hoc/withAdminAuth";
 
-export default function AdminStripeAccounts() {
+function AdminStripeAccounts() {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
 
@@ -97,3 +98,6 @@ export default function AdminStripeAccounts() {
         </section>
     );
 }
+
+
+export default withAdminAuth(AdminStripeAccounts)

@@ -10,6 +10,7 @@ export default function CreateProduct({ token }) {
     const [category, setCategory] = useState('Vegetables');
     const [image, setImage] = useState(null);
     const [imageCDNLink, setImageCDNLink] = useState('');
+    const [unitType, setUnitType] = useState('integer');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -38,7 +39,6 @@ export default function CreateProduct({ token }) {
         e.preventDefault();
         setLoading(true);
 
-        // Simulate a delay for CDN creation
         setTimeout(async () => {
             const response = await fetch('/api/products', {
                 method: 'POST',
@@ -46,7 +46,7 @@ export default function CreateProduct({ token }) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink }),
+                body: JSON.stringify({ title, description, quantity, units, price, category, imageCDNLink, unitType }),
             });
 
             if (response.ok) {
@@ -113,7 +113,7 @@ export default function CreateProduct({ token }) {
                             id="units"
                             type="text"
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Units"
+                            placeholder="Units (e.g., kg, pieces, packs)"
                             value={units}
                             onChange={(e) => setUnits(e.target.value)}
                             required
@@ -156,17 +156,31 @@ export default function CreateProduct({ token }) {
                             onChange={(e) => handleImageUpload(e.target.files[0])}
                         />
                     </div>
-                    <div className="mb-4" hidden>
-                        <label className="block text-gray-700 mb-2" htmlFor="imageCDNLink">Image CDN Link
-                            (Optional)</label>
-                        <input
-                            id="imageCDNLink"
-                            type="text"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Image CDN Link"
-                            value={imageCDNLink}
-                            onChange={(e) => setImageCDNLink(e.target.value)}
-                        />
+                    <div className="mb-4">
+                        <label className="block text-gray-700 mb-2">Can this product be sold in fractional quantities?</label>
+                        <div className="flex items-center">
+                            <input
+                                type="radio"
+                                id="integer"
+                                name="unitType"
+                                value="integer"
+                                checked={unitType === 'integer'}
+                                onChange={(e) => setUnitType(e.target.value)}
+                                className="mr-2"
+                            />
+                            <label htmlFor="integer" className="mr-4">No, only whole units</label>
+                            <input
+                                type="radio"
+                                id="decimal"
+                                name="unitType"
+                                value="decimal"
+                                checked={unitType === 'decimal'}
+                                onChange={(e) => setUnitType(e.target.value)}
+                                className="mr-2"
+                            />
+                            <label htmlFor="decimal">Yes, fractional units are allowed</label>
+                        </div>
+                        <p className="text-gray-500 text-sm mt-2">Select &#34;No&#34; if your product can only be sold in whole units (e.g., pieces, packs). Select &#34;Yes&#34; if your product can be sold in fractional quantities (e.g., weight, volume).</p>
                     </div>
                     <button type="submit"
                             className="w-full py-2 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300">

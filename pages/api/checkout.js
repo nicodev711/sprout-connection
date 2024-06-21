@@ -81,11 +81,18 @@ const checkoutHandler = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${req.headers.origin}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${req.headers.origin}/cancel`,
+            success_url: `https://${req.headers.host}/api/orders/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://${req.headers.host}/cancel`,
             metadata: {
                 userId: userId,
-                cart: JSON.stringify(cart), // Include cart data as metadata
+                cart: JSON.stringify(cart.map(item => ({
+                    _id: item._id,
+                    title: item.title,
+                    userId: item.userId,
+                    quantity: item.quantity,
+                    price: item.price,
+                    units: item.units,
+                }))), // Only include essential fields
             },
             payment_intent_data: {
                 application_fee_amount: Math.round((parseFloat(serviceFee) + parseFloat(smallOrderFee)) * 100), // Platform fee in pence
