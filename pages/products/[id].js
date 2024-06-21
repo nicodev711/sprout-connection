@@ -59,7 +59,6 @@ export default function ProductDetails() {
             createdAt: product.createdAt,
             modifiedAt: product.modifiedAt,
             unitType: product.unitType // Add this line
-            unitType: product.unitType // Ensure unitType is included
         };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
     };
