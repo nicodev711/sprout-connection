@@ -18,12 +18,15 @@ const SearchPage = () => {
     const { query, category, postcode, range } = router.query;
 
     const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
             const res = await fetch(`/api/search?query=${query}&category=${category}&postcode=${postcode}&range=${range}`);
             const data = await res.json();
             setResults(data);
+            setLoading(false);
         };
 
         if (query || category || postcode || range) {
@@ -48,33 +51,43 @@ const SearchPage = () => {
             </aside>
             <div className="w-full lg:w-3/4 p-4">
                 <h3 className="text-lg font-bold mb-2 text-center">Search Results</h3>
-                {results.length > 0 ? (
-                    <div className="flex flex-wrap justify-center">
-                        {results.map((result) => (
-                            <Link key={result._id} href={`/products/${result._id}`}>
-                                <div className="card card-compact w-64 bg-base-100 shadow-xl m-4">
-                                    <figure className="relative h-48 w-full overflow-hidden rounded-lg">
-                                        <Image
-                                            src={result.imageCDNLink && result.imageCDNLink.trim() !== '' ? result.imageCDNLink : '/product.png'}
-                                            alt={result.title}
-                                            layout="fill"
-                                            objectFit="cover"
-                                        />
-                                    </figure>
-                                    <div className="card-body">
-                                        <h2 className="card-title">{result.title}</h2>
-                                        <p>{truncateText(result.description, 30)}</p>
-                                        <p className="text-lg font-semibold">£{result.price}</p>
-                                        <div className="card-actions justify-end">
-                                            <button className="btn btn-primary">Buy Now</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                {loading ? (
+                    <div className="flex justify-center items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span>Loading...</span>
                     </div>
                 ) : (
-                    <p className="text-center">No results found.</p>
+                    results.length > 0 ? (
+                        <div className="flex flex-wrap justify-center">
+                            {results.map((result) => (
+                                <Link key={result._id} href={`/products/${result._id}`}>
+                                    <div className="card card-compact w-64 bg-base-100 shadow-xl m-4">
+                                        <figure className="relative h-48 w-full overflow-hidden rounded-lg">
+                                            <Image
+                                                src={result.imageCDNLink && result.imageCDNLink.trim() !== '' ? result.imageCDNLink : '/product.png'}
+                                                alt={result.title}
+                                                layout="fill"
+                                                objectFit="cover"
+                                            />
+                                        </figure>
+                                        <div className="card-body">
+                                            <h2 className="card-title">{result.title}</h2>
+                                            <p>{truncateText(result.description, 30)}</p>
+                                            <p className="text-lg font-semibold">£{result.price}</p>
+                                            <div className="card-actions justify-end">
+                                                <button className="btn btn-primary">Buy Now</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center">No results found.</p>
+                    )
                 )}
             </div>
         </div>
