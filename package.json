@@ -37,12 +37,9 @@
     "react-dom": "^18",
     "react-icons": "^5.2.1",
     "react-leaflet": "^4.2.1",
-<<<<<<< HEAD
     "react-quill": "^2.0.0",
     "react-share": "^5.1.0",
-=======
     "react-quill": "^0.0.2",
->>>>>>> 0931d6c557ae9893fc01c17a560c3e8622e0b34c
     "sharp": "^0.33.4",
     "sitemap": "^8.0.0",
     "stripe": "^15.8.0"
