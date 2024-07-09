@@ -11,7 +11,7 @@ import 'leaflet/dist/leaflet.css';
 Chart.register(ArcElement, Tooltip, Legend);
 
 // Dynamically import the MapComponent with no SSR
-const MapComponent = dynamic(() => import('./MapComponent'), {
+const MapComponent = dynamic(() => import('@/components/dashboard/MapComponent').then(mod => mod.MapComponent), {
     ssr: false,
 });
 

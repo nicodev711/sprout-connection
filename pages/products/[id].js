@@ -1,3 +1,5 @@
+'use client';
+
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -15,6 +17,13 @@ import {
     LinkedinIcon,
     WhatsappIcon
 } from 'react-share';
+import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
+
+// Dynamically import the MapComponent with no SSR
+const MapComponent = dynamic(() => import('@/components/dashboard/MapComponent').then(module => module.MapComponentProduct), {
+    ssr: false,
+});
 
 export default function ProductDetails() {
     const router = useRouter();
@@ -130,12 +139,13 @@ export default function ProductDetails() {
                         <h1 className="text-4xl font-bold mb-6">{product.title}</h1>
                         <p className="text-2xl font-semibold text-green-600 mb-4">£{product.price} per {product.units}</p>
                         <p className="text-gray-700 mb-6 break-words">{product.description}</p>
+                        <div className="h-96 w-full">
+                            <MapComponent productLocation={{ lat: product.latitude, lon: product.longitude }} />
+                        </div>
                         {product.quantity ? (
                             <p className="text-gray-700 mb-4">Available Quantity: {product.quantity} {product.units}</p>
-                        ) : (
-                            <p className="text-gray-700 mb-4">No Quantity Available</p>
-                        )}
-                        <div className="mb-6">
+                        ) : null}
+                        <div className="mb-6 mt-6">
                             <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
                                 Quantity
                             </label>
@@ -170,16 +180,17 @@ export default function ProductDetails() {
                         </div>
                         <div className="mt-8 flex space-x-4">
                             <FacebookShareButton url={shareUrl} quote={product.title} hashtag="#SproutConnection">
-                                <FacebookIcon size={40} round />
+                                <FacebookIcon size={40} round/>
                             </FacebookShareButton>
                             <TwitterShareButton url={shareUrl} title={product.title} hashtags={["SproutConnection"]}>
-                                <TwitterIcon size={40} round />
+                                <TwitterIcon size={40} round/>
                             </TwitterShareButton>
-                            <LinkedinShareButton url={shareUrl} title={product.title} summary={product.description} source="Sprout Connection">
-                                <LinkedinIcon size={40} round />
+                            <LinkedinShareButton url={shareUrl} title={product.title} summary={product.description}
+                                                 source="Sprout Connection">
+                                <LinkedinIcon size={40} round/>
                             </LinkedinShareButton>
                             <WhatsappShareButton url={shareUrl} title={product.title} separator=":: ">
-                                <WhatsappIcon size={40} round />
+                                <WhatsappIcon size={40} round/>
                             </WhatsappShareButton>
                         </div>
                     </div>

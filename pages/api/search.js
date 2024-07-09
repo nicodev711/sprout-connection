@@ -12,7 +12,6 @@ export default async function handler(req, res) {
         const searchCriteria = {};
 
         if (query) {
-            // Use regex to match partial strings case-insensitively
             searchCriteria.title = { $regex: query, $options: 'i' };
         }
 
@@ -20,9 +19,8 @@ export default async function handler(req, res) {
             searchCriteria.category = category;
         }
 
-        let products = await Product.find(searchCriteria);
+        let products = await Product.find(searchCriteria).lean();
 
-        // Filter by postcode and range
         if (postcode) {
             const userPostcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
             const userPostcodeData = await userPostcodeResponse.json();
@@ -33,14 +31,18 @@ export default async function handler(req, res) {
                     longitude: userPostcodeData.result.longitude
                 };
 
-                products = products.filter(product => {
+                products = products.map(product => {
                     const distance = getDistance(
                         { latitude: product.latitude, longitude: product.longitude },
                         userLocation
                     );
-                    // Convert distance to miles and check if it's within the specified range
-                    return distance <= range * 1609.34; // 1 mile = 1609.34 meters
+                    return {
+                        ...product,
+                        distance: distance / 1609.34 // Convert distance to miles
+                    };
                 });
+
+                products = products.filter(product => product.distance <= range);
             } else {
                 return res.status(400).json({ error: 'Invalid postcode' });
             }

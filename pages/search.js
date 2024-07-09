@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SearchBar from '@/components/SearchBar';
-import Link from "next/link";
-import Image from "next/image";
-import Head from "next/head";
+import Link from 'next/link';
+import Image from 'next/image';
+import Head from 'next/head';
 
 const truncateText = (text, maxLength) => {
     if (text.length > maxLength) {
@@ -23,7 +23,8 @@ const SearchPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
-            const res = await fetch(`/api/search?query=${query}&category=${category}&postcode=${postcode}&range=${range}`);
+            let url = `/api/search?query=${query}&category=${category}&postcode=${postcode}&range=${range}`;
+            const res = await fetch(url);
             const data = await res.json();
             setResults(data);
             setLoading(false);
@@ -38,12 +39,10 @@ const SearchPage = () => {
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
             <Head>
                 <title>Sprout Connections - Search</title>
-                <meta name="description"
-                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors"/>
-                <meta property="og:description"
-                      content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!"/>
-                <meta property="og:url" content="https://www.sproutconnections.com"/>
+                <meta name="description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                <meta property="og:title" content="Sprout Connections - Fresh Garden Produce from Your Neighbors" />
+                <meta property="og:description" content="Buy and sell fresh, locally-grown produce directly from gardeners in your community. Join Sprout Connections today!" />
+                <meta property="og:url" content="https://www.sproutconnections.com" />
             </Head>
             <aside className="w-full bg-gray-100 p-4 rounded-lg shadow-md mb-4 lg:hidden">
                 <h2 className="text-xl font-bold mb-4">Search</h2>
@@ -75,6 +74,11 @@ const SearchPage = () => {
                                         </figure>
                                         <div className="card-body">
                                             <h2 className="card-title">{result.title}</h2>
+                                            {result.distance ? (
+                                                <p>{result.distance.toFixed(2)} miles from you</p>
+                                            ) : (
+                                                <p>Location: {result.postcode} </p>
+                                            )}
                                             <p>{truncateText(result.description, 30)}</p>
                                             <p className="text-lg font-semibold">£{result.price}</p>
                                             <div className="card-actions justify-end">
