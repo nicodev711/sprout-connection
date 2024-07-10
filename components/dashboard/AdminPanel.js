@@ -19,6 +19,14 @@ const AdminPanel = () => {
     const [userCount, setUserCount] = useState(0);
     const [gardenerCount, setGardenerCount] = useState(0);
     const [userLocations, setUserLocations] = useState([]);
+    const [productCount, setProductCount] = useState(0);
+    const [categoryCounts, setCategoryCounts] = useState({
+        Vegetables: 0,
+        Fruits: 0,
+        Honey: 0,
+        Plants: 0,
+        Seeds: 0,
+    });
 
     useEffect(() => {
         // Fetch user data
@@ -38,7 +46,32 @@ const AdminPanel = () => {
             }
         };
 
+        // Fetch product data
+        const fetchProductData = async () => {
+            try {
+                const response = await axios.get('/api/products');
+                const products = response.data;
+                setProductCount(products.length);
+
+                const categoryCounts = products.reduce((acc, product) => {
+                    acc[product.category] = (acc[product.category] || 0) + 1;
+                    return acc;
+                }, {
+                    Vegetables: 0,
+                    Fruits: 0,
+                    Honey: 0,
+                    Plants: 0,
+                    Seeds: 0,
+                });
+
+                setCategoryCounts(categoryCounts);
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+            }
+        };
+
         fetchUserData();
+        fetchProductData();
     }, []);
 
     const pieData = {
@@ -48,6 +81,17 @@ const AdminPanel = () => {
                 data: [gardenerCount, userCount - gardenerCount],
                 backgroundColor: ['#36A2EB', '#FF6384'],
                 hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+            },
+        ],
+    };
+
+    const productPieData = {
+        labels: ['Vegetables', 'Fruits', 'Honey', 'Plants', 'Seeds'],
+        datasets: [
+            {
+                data: Object.values(categoryCounts),
+                backgroundColor: ['#FFCE56', '#36A2EB', '#FF6384', '#4BC0C0', '#9966FF'],
+                hoverBackgroundColor: ['#FFCE56', '#36A2EB', '#FF6384', '#4BC0C0', '#9966FF'],
             },
         ],
     };
@@ -67,6 +111,14 @@ const AdminPanel = () => {
                         <h2 className="text-2xl mb-4">User Locations</h2>
                         <div className="h-96 w-full">
                             <MapComponent userLocations={userLocations} />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex-1 bg-gray-50 p-4 rounded-lg shadow-md">
+                        <h2 className="text-2xl mb-4">Total Products: <span className="font-semibold">{productCount}</span></h2>
+                        <div className="flex justify-center">
+                            <Pie data={productPieData} />
                         </div>
                     </div>
                 </div>

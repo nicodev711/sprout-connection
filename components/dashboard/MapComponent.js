@@ -9,12 +9,12 @@ import '@fortawesome/fontawesome-svg-core/styles.css'; // Import the FontAwesome
 const primaryColor = '#76b852';
 
 const gardenerIcon = L.divIcon({
-    html: <div style="color: green;"><i class="fa fa-leaf"></i></div>,
+    html: '<div style="color: green;"><i class="fa fa-leaf"></i></div>',
     className: 'custom-icon'
 });
 
 const userIcon = L.divIcon({
-    html: <div style="color: blue;"><i class="fa fa-user"></i></div>,
+    html: '<div style="color: blue;"><i class="fa fa-user"></i></div>',
     className: 'custom-icon'
 });
 
