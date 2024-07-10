@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { query, category, postcode, range = 5 } = req.query;
 
     try {
-        const searchCriteria = {};
+        const searchCriteria = { isListed: true }; // Add isListed: true to search criteria
 
         if (query) {
             searchCriteria.title = { $regex: query, $options: 'i' };
