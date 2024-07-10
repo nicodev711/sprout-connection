@@ -30,40 +30,39 @@ export default async function handler(req, res) {
         user.resetPasswordTokenExpiry = resetTokenExpiry;
         await user.save();
 
+        // Create a transporter using GoDaddy's SMTP server
         const transporter = nodemailer.createTransport({
-            host: 'smtp-relay.brevo.com', // Brevo SMTP server
-            port: 587, // Brevo SMTP port
+            host: 'smtpout.secureserver.net', // GoDaddy SMTP server
+            port: 587, // GoDaddy SMTP port (usually 587 or 465)
             secure: false, // true for 465, false for other ports
             auth: {
-                user: process.env.BREVO_USER, // Your Brevo SMTP username
-                pass: process.env.BREVO_PASS, // Your Brevo SMTP password
+                user: process.env.GODADDY_EMAIL_USER, // Your GoDaddy email username
+                pass: process.env.GODADDY_EMAIL_PASS, // Your GoDaddy email password
             },
         });
 
-        // const mailOptions = {
-        //     from: process.env.BREVO_USER,
-        //     to: 'recipient@example.com',
-        //     subject: 'Test Email',
-        //     text: 'This is a test email.',
-        // };
+        // Function to send the recovery email
+        const sendRecoveryEmail = async (toEmail, recoveryLink) => {
+            const mailOptions = {
+                from: process.env.GODADDY_EMAIL_USER, // Sender address
+                to: toEmail, // Recipient address
+                subject: 'Password Recovery',
+                text: `Click the following link to reset your password: ${recoveryLink}`,
+                html: `<p>Click the following link to reset your password: <a href="${recoveryLink}">${recoveryLink}</a></p>`,
+            };
 
-        const mailOptions = {
-            to: user.email,
-            from: process.env.BREVO_USER,
-            subject: 'Password Reset Request',
-            text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n` +
-                `Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
-                `${process.env.BASE_URL}/reset-password?token=${resetToken}\n\n` +
-                `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+            try {
+                const info = await transporter.sendMail(mailOptions);
+                console.log('Email sent:', info.response);
+            } catch (error) {
+                console.error('Error sending email:', error);
+                throw new Error('Failed to send email');
+            }
         };
 
-        await transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log('Error sending email:', error);
-            } else {
-                console.log('Email sent:', info.response);
-            }
-        });
+        // Generate the recovery link and send the email
+        const recoveryLink = `http://localhost:3000/recover?token=${resetToken}`;
+        await sendRecoveryEmail(email, recoveryLink);
 
         res.status(200).json({ message: 'Password reset email sent' });
     } catch (error) {
