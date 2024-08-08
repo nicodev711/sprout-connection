@@ -2,8 +2,31 @@ import Stripe from 'stripe';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import User from "@/models/User";
+import nodemailer from 'nodemailer';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const sendOrderEmail = async (recipientEmail, subject, message) => {
+    // Set up the transporter
+    const transporter = nodemailer.createTransport({
+        service: 'outlook',
+        auth: {
+            user: process.env.GODADDY_EMAIL_USER, // Your email address
+            pass: process.env.GODADDY_EMAIL_PASS, // Your email password
+        },
+    });
+
+    // Construct the email content
+    const mailOptions = {
+        from: process.env.GODADDY_EMAIL_USER,
+        to: recipientEmail,
+        subject: subject,
+        text: message,
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+};
 
 const handler = async (req, res) => {
     const sessionId = req.query.session_id;
@@ -51,14 +74,48 @@ const handler = async (req, res) => {
 
         await order.save();
 
-        // Update the withdrawable amount for each gardener, excluding fees
+        // Send email to each gardener
         await Promise.all(gardenerIds.map(async gardenerId => {
             const gardener = await User.findById(gardenerId);
             if (gardener) {
                 gardener.withdrawableAmount += parseFloat(totalProductAmount);
                 await gardener.save();
+
+                const gardenerMessage = `Hello,
+
+You have received a new order. Here are the details:
+
+${products.map(product => `Product: ${product.name}, Quantity: ${product.quantity}, Total: $${product.total.toFixed(2)}`).join('\n')}
+
+Total Amount: $${total.toFixed(2)}
+
+Please log in to your account to view more details.
+
+Best regards,
+Sprout Connections`;
+
+                await sendOrderEmail(gardener.email, 'New Order Notification', gardenerMessage);
             }
         }));
+
+        // Send confirmation email to buyer
+        const buyer = await User.findById(userId);
+        if (buyer) {
+            const buyerMessage = `Hello ${buyer.name},
+
+Thank you for your order! Here are the details:
+
+${products.map(product => `Product: ${product.name}, Quantity: ${product.quantity}, Total: $${product.total.toFixed(2)}`).join('\n')}
+
+Total Amount: $${total.toFixed(2)}
+
+We will notify you when your order is on its way.
+
+Best regards,
+Sprout Connections`;
+
+            await sendOrderEmail(buyer.email, 'Order Confirmation', buyerMessage);
+        }
 
         // Redirect to success page
         res.writeHead(302, { Location: '/success' });
