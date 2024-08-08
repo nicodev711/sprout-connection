@@ -58,7 +58,11 @@ export default function ProductDetails() {
             longitude: product.longitude,
             createdAt: product.createdAt,
             modifiedAt: product.modifiedAt,
+<<<<<<< HEAD
             unitType: product.unitType // Add this line
+=======
+            unitType: product.unitType // Ensure unitType is included
+>>>>>>> 6c418991ebf939c206ed4b69ff3e7ff409070d0d
         };
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
     };
